@@ -11,7 +11,7 @@ class Plant {
 
   // age
   float age = 0;
-  float ageDeath = random(1.0, 1.3);
+  float ageDeath;
   float ageGrowthStops = 0.9;
   float  bloomAge = 0.6;
   boolean dies = true;
@@ -19,15 +19,14 @@ class Plant {
   boolean respawns = false;
 
   // growth and height
-  float growthRate = random(ageInc - ageInc*.2, ageInc + ageInc * .2);
+  float growthRate;
   float plantHeight = 0;
   float growthScaler = 200;
   int numSegments = 5;
   float totLen = 0;
   float currentLen = 0;
 
-  float curveAngle = radians(random(-10, 10));
-  float  stemAngle = radians(random(-5, 5));
+  float curveAngle, stemAngle;
   int numBranch = 0;
 
   boolean hasLeaves = false;
@@ -40,7 +39,7 @@ class Plant {
 
   // randomish noise
   float yoff = 0;
-  int seed = plantID;
+  int seed;
 
 
   public Plant(PVector loc, float age, boolean dies) {
@@ -60,9 +59,19 @@ class Plant {
     this.x = x;
     this.y = y;
     this.z = z;
+    ageDeath = random(1.0, 1.3);
+    growthRate = random(ageInc - ageInc*.2, ageInc + ageInc * .2);
+    curveAngle = radians(random(-10, 10));
+    stemAngle = radians(random(-5, 5));
+
     id = code;
+    if (code  < 0) seed = int(random(0, 100));
     col = color(0, random(150, 255), 0);
+    // maybe everything should just start at 0
+    //this.age = age;
+    //this.plantHeight = age;
   }
+
 
   public void display(PGraphics s) {
     //s.stroke(col);

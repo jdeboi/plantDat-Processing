@@ -1,14 +1,14 @@
 PlantFile[] stokesFlowers;
 PlantFile stokesLeaf;
-float[] stokesScales = {0.5, 0.7, .8, .8};
+float[] stokesScales = {0.5, 0.7, .6, .6};
 boolean[] stokesFlipped = {false, false, false, false};
 float[] stokesRot = {0, 0, 0, 0};
-PVector[] stokesSnaps = {new PVector(24, 35), new PVector(53, 81), new PVector(75, 85), new PVector(95, 135)};
+PVector[] stokesSnaps = {new PVector(24, 35), new PVector(53, 81), new PVector(75, 85), new PVector(95, 105)};
 
 
 void initStokes() {  
   stokesFlowers = new PlantFile[4];
-  stokesLeaf = new PlantFile("stokes/leaves/0.svg", false, 4, 131, 1, 0);
+  stokesLeaf = new PlantFile("stokes/leaves/0.svg", false, 4, 131, 0.6, 0);
   for (int i = 0; i < stokesFlowers.length; i++) {
     stokesFlowers[i] = new PlantFile("stokes/flower/" + i + ".svg", stokesFlipped[i], stokesSnaps[i].x, stokesSnaps[i].y, stokesScales[i], stokesRot[i]);
   }
@@ -28,7 +28,7 @@ class Stokes extends Plant {
   Stokes(PVector loc, float age, int code) {
     super(loc, age, code);
     //leaves = new ArrayList<BeautyLeaf>();
-    growthScaler = 300;
+    growthScaler = 200;
     branching = true;
     isFlowering = true;
     hasLeaves = true;
@@ -43,6 +43,7 @@ class Stokes extends Plant {
     //s.stroke(col);
     s.pushMatrix();
     s.translate(x, y, z);
+    s.rotateX(radians(25));
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);

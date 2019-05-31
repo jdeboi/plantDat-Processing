@@ -142,45 +142,43 @@ void initBackground() {
 void displayHouse(PGraphics s, int z ) {
   s.pushMatrix();
 
-  float w = 1400;
+  float w = 1500;
   float factor = w/shotgun2.width;
   float h = shotgun2.height*factor;
 
   s.translate(0, -200, z);
 
   displayCement(s, z-1);
+  drawFence(s, z);
 
   s.pushMatrix();
-  s.translate(-900, -200);
+  s.translate(-600, -200);
   s.rotate(radians(0));
   s.image(shotgun1, 0, 0, w, h);
   s.popMatrix();
 
   s.pushMatrix();
-  s.translate(300, -200);
+  s.translate(600, -200);
   s.rotate(radians(0));
   s.image(shotgun2, 0, 0, w, h);
   s.popMatrix();
 
-  drawFence(s, z);
+  
 
   s.popMatrix();
 }
 
 void drawFence(PGraphics s, int z) {
   s.pushMatrix();
-  s.translate(0, -300);
-  float fenceH = 400;
+  s.translate(0, -750);
+  float fenceH = 170;
   float factor = fenceH/fence.height;
-  for (int i = int(s.width); i < s.width*2; i+= fence.width*factor) {
+  for (int i = int(s.width*1.4); i < s.width*2; i+= fence.width*factor) {
     s.image(fence, i, shotgun1.height*2-fenceH, fence.width*factor, fenceH);
   }
-  //for (int i = ; i < -1000; i+= fence.width*factor) {
-  s.pushMatrix();
-  //s.scale(-1, 1);
-  s.image(fence, z-fence.width*factor*.8, shotgun1.height*2-fenceH, fence.width*factor, fenceH);
-  s.popMatrix();
-  //}
+  for (int i = -1500; i < 300; i+= fence.width*factor) {
+    s.image(fence, i, shotgun1.height*2-fenceH, fence.width*factor, fenceH);
+  }
   s.popMatrix();
 }
 
@@ -233,7 +231,7 @@ void displaySky(PGraphics s) {
 
 void displayCement(PGraphics s, int z) {
   s.pushMatrix();
-  s.translate(-s.width, s.height*.4, z);
+  s.translate(-s.width, 230, z);
   s.noStroke();
   //s.rotateX(radians(90));
   s.fill(cementColor);

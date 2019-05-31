@@ -32,6 +32,7 @@ class Lizard extends Plant {
 
   void display(PGraphics s) {
     yoff += 0.005;
+    //println(seed);
     randomSeed(seed);
     s.strokeWeight(1);
     //s.stroke(0, 255, 0);

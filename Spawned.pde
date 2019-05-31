@@ -9,10 +9,41 @@ PShape shovel;
 
 void initPermPlants() {
   permPlants = new ArrayList<Plant>();
+  
+  // right side plants
+  permPlants.add(new Lizard(getSpawnedXY(82, -15), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(85, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(80, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(85, 0), 1.0, false));
-  permPlants.add(new Stokes(getSpawnedXY(90, 0), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(87, -15), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(90, 0), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(92, -20), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(93, -10), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(95, 0), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(97, -20), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(100, 0), 1.0, false));
+  
+  // left side plants
+  permPlants.add(new Lizard(getSpawnedXY(0, -15), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(2, -20), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(3, 0), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(5, -15), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(7, -5), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(10, -10), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(12, 0), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(13, -20), 1.0, false));
+}
+
+void displaySpawned(PGraphics s) {
+  for (int i = 0; i < spawnedPlants.size(); i++) {
+    spawnedPlants.get(i).display(s);
+    spawnedPlants.get(i).grow();
+  }
+}
+
+void displayPermanent(PGraphics s) {
+  for (int i = 0; i < permPlants.size(); i++) {
+    permPlants.get(i).display(s);
+    permPlants.get(i).grow();
+  }
 }
 
 //long lastPlantRemoval = 0;
@@ -82,7 +113,7 @@ void addNewPlant(JSONObject pObj, int code) {
   int x = plant.getInt("x");
   int y = plant.getInt("y");
   PVector xy = getSpawnedXY(x, y);
-  if (name.equals("Lizard's Tail") || name.equals("Beauty Berry")) {
+  if (name.equals("Lizard's Tail")) {
     spawnedPlants.add(new Lizard(xy, age, code));
   } else if (name.equals("Beauty Berry")) {
     spawnedPlants.add(new Beauty(xy, age, code));

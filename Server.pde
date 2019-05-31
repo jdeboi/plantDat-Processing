@@ -118,11 +118,11 @@ public class ServerThread extends Thread {
 
 class ClientLoc {
 
-  String type;
+  int type;
   PVector loc;
 
   public ClientLoc() {
-    type = "";
+    type = 0;
     loc = new PVector(-4000, -4000);
   }
 
@@ -130,14 +130,14 @@ class ClientLoc {
     try {
       int xindex = message.indexOf("X");
       int yindex = message.indexOf("Y");
-      type = message.substring(1, xindex);
+      type = parseInt(message.substring(1, xindex));
       int x = parseInt(message.substring(xindex+1, yindex));
       int y = parseInt(message.substring(yindex+1));
       loc = getSpawnedXY(x, y);
     }
     catch (Exception e) {
       println("message exception");
-      type = "";
+      type = 0;
       loc = new PVector(-4000, -4000);
     }
   }
@@ -146,43 +146,45 @@ class ClientLoc {
     try {
       int xindex = message.indexOf("X");
       int yindex = message.indexOf("Y");
-      type = message.substring(1, xindex);
+      type = parseInt(message.substring(1, xindex));
       int x = parseInt(message.substring(xindex+1, yindex));
       int y = parseInt(message.substring(yindex+1));
       loc = getSpawnedXY(x, y);
     }
     catch(Exception e) {
       println("got an update-related issue");
-      type = "";
+      //type = "";
       loc = new PVector(-4000, -4000);
     }
   }
 
   void display(PGraphics s) {
-    switch (type) {
-    case "beauty":
-      s.fill(255, 0, 0);
-      break;
-    case "clasping":
-      s.fill(255, 255, 0);
-      break;
-    case "stokes":
-      s.fill(0, 255, 0);
-      break;
-    case "obedient":
-      s.fill(0, 0, 255);
-      break;
-    case "lizard":
-      s.fill(0, 255, 255);
-      break;
-    }
+    
     s.pushMatrix();
+    displayShovel(s);
+    s.popMatrix();
+  }
+
+  void displayShovel(PGraphics s) {
+    //color[] colors = {color(255, 0, 0), color(255, 255, 0), color(0, 0, 255), color(0, 255, 255), color(255, 0, 255)};
+    colorMode(HSB, 100);
+    color c = color(type, 100, 100);
+    colorMode(RGB, 255);
+    
     float shovelH = 300;
     float factor = 1.0* shovelH/shovel.height;
-
+    float shovelW = shovel.width*factor;
     s.translate(loc.x, s.height - shovelH, loc.y);
-    
-    s.shape(shovel, 0, 0, shovel.width*factor, shovelH);
-    s.popMatrix();
+    //s.rotateX(25);
+    s.fill(c);
+    s.noStroke();
+    s.beginShape();
+    s.vertex(shovelW*.40, shovelH*.2);
+    s.vertex(shovelW*.58, shovelH*.2);
+    s.vertex(shovelW*.58, shovelH*.6);
+    s.vertex(shovelW*.40, shovelH*.6);
+    s.endShape();
+    s.translate(0, 0, .5);
+    s.shape(shovel, 0, 0, shovelW, shovelH);
   }
 }

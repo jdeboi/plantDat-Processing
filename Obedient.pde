@@ -46,6 +46,7 @@ class Obedient extends Plant {
     //s.stroke(col);
     s.pushMatrix();
     s.translate(x, y, z);
+    s.rotateX(radians(25));
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);

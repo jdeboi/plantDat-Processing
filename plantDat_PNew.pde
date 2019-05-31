@@ -18,15 +18,18 @@ void setup() {
   canvas = createGraphics (width, height, P3D);
   initScreens();
   initServer();
-
+  
   // plant files
-  initGrasses();
   initBeauty();
   initStokes();
   initLizard();
   initClasping();
   initObedient();
   initSpawned();
+  
+  // permanent plants
+  initGrasses();
+  initPermPlants();
 
   // the elements
   initBackground();
@@ -58,14 +61,12 @@ void draw() {
   displayGrass(canvas, grasses);
 
   // plants
-  for (int i = 0; i < spawnedPlants.size(); i++) {
-    spawnedPlants.get(i).display(canvas);
-    spawnedPlants.get(i).grow();
-  }
-
-
+  displaySpawned(canvas);
+  displayPermanent(canvas);
   displayLiveSpawn(canvas);
-  displayBoundaries(canvas);
+  
+  // utility
+  //displayBoundaries(canvas);
   
   // water
   displayWater(canvas, -370);
@@ -91,7 +92,8 @@ void update() {
   // the elements
   checkThunder();
   checkRain();
-  setWater();
+  //setWater();
+  waterOff();
   setGridTerrain();
   wind();
   playSounds();
