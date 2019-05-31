@@ -16,10 +16,16 @@ class Beauty extends Plant {
 
   //ArrayList<BeautyLeaf> leaves;
 
-   Beauty(PVector loc, float age) {
-    super(loc, age);
+  Beauty(PVector loc, float age, boolean dies) {
+    this(loc, age, -1);
+    this.dies = dies;
+  }
+
+  Beauty(PVector loc, float age, int code) {
+    super(loc, age, code);
     //leaves = new ArrayList<BeautyLeaf>();
     hasLeaves = true;
+    leafSpacing = 20;
   }
 
   void display(PGraphics s) {
@@ -34,31 +40,42 @@ class Beauty extends Plant {
     totLen = leafSpacing;
     currentLen = leafSpacing;
 
-    stem(s, plantHeight*growthScaler, 0, age);
+    s.stroke(0);
+    s.fill(col);
+    stem(s, plantHeight*growthScaler, 0, age, stemStroke);
     //leaves(s);
     s.popMatrix();
+
+    col = color(#57ED66);
   }
 
   void leaf(int segment, PGraphics s) {
-    int numleaves = int(plantHeight*growthScaler/ leafSpacing);
-    if (numBranch <= numleaves) {
-      float leafScale = map(numBranch, 0, 5, .6, .2)*plantHeight;
+    int numleaves = round(plantHeight*growthScaler/ leafSpacing);
+    if (segment <= numleaves) {
+      float leafScale = map(segment, 0, 5, .6, .2)*plantHeight;
       leafScale = constrain(leafScale, 0.1, 1.0);
       beautyFiles[1].display(0, 0, 0, leafScale, false, s);
       beautyFiles[1].display(0, 0, 0, leafScale, true, s);
-      s.fill(255, 0, 255);
-      float berrySize = leafScale*10;
-      int berrySpacings[][] = {{0, 0}, {-10, 10}, {7, 8}, {-5, -10}, {4, -6}};
-      for (int j = 0; j < berrySpacings.length; j++) {
-        //PShape circ = createShape(ELLIPSE,berrySpacings[j][0]*leafScale, berrySpacings[j][1]*leafScale, berrySize, berrySize);
-        //s.shape(circ);
-        s.pushMatrix();
-        s.translate(0, 0, 1);
-        s.ellipse(berrySpacings[j][0]*leafScale, berrySpacings[j][1]*leafScale, berrySize, berrySize);
-        s.popMatrix();
-      }
+      if (isFlowering) berry(s, leafScale);
     }
   }
 
-  
+  void berry(PGraphics s, float leafScale) {
+    s.fill(235, 0, 255);
+    s.stroke(255);
+    float berryAge = map(age, bloomAge, 1.0, 0, 1.0);
+    float berrySize = leafScale*20*berryAge;
+    int berrySpacings[][] = {{0, 0}, {-15, 13}, {7, 12}, {-9, -10}, {4, -6}};
+    s.pushMatrix();
+    s.translate(0, 0, 1);
+    for (int j = 0; j < berrySpacings.length; j++) {
+      s.ellipse(berrySpacings[j][0]*leafScale, berrySpacings[j][1]*leafScale, berrySize, berrySize);
+    }
+    s.popMatrix();
+  }
+
+  @Override
+    void flower(PGraphics s, float stemage) {
+    // nada
+  }
 }

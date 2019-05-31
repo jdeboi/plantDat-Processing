@@ -1,5 +1,5 @@
-int rainLasts = 1*10*1000;
-int sunLasts = 1*10*1000;
+int rainLasts = 1*60*1000;
+int sunLasts = 1*60*1000;
 long lastRainTime = 0;
 
 PImage shotgun1, shotgun2;
@@ -7,7 +7,6 @@ PImage cement;
 PImage fence;
 
 PImage plants[];
-PShape plants2[];
 
 boolean isRaining = true;
 boolean thunder = false;
@@ -18,11 +17,39 @@ int thunderNum = 0;
 long ranTime = 0;
 int tTime = 20;
 
-color cementColor = color(170);
 
 import ddf.minim.*;
 Minim minim;
-AudioPlayer player;
+AudioPlayer thunderSound;
+AudioPlayer rainSound;
+AudioPlayer windSound;
+
+boolean rainEnding = false;
+
+void playSounds() {
+  if (thundering) {
+    if (!thunderSound.isPlaying()) thunderSound.play(0);
+    rainSound.setGain(0);
+    windSound.setGain(-100);
+  }
+  if (isRaining) {
+    // this will work as long as the rain soundfile is longer than the time rain lasts
+    if (!rainSound.isPlaying()) rainSound.play(0);
+    if (millis() - lastRainTime > rainLasts - 4000) {
+      rainSound.shiftGain(rainSound.getGain(), -100, 4000);
+      windSound.setGain(-4);
+    }
+  }
+}
+
+void stop() {
+  windSound.close();
+  thunderSound.close();
+  rainSound.close();
+  minim.stop();
+}
+
+
 
 color getBackground() {
   //s.background(#6965D6);
@@ -36,18 +63,18 @@ color getBackground() {
     long timeP = millis() - lastRainTime;
     if (timeP < rainLasts*.7) {
       c = color(50);
-      println("raining");
+      //println("raining");
     } else if (timeP < rainLasts) {
       float per = map(timeP, rainLasts*.7, rainLasts, 0, 1);
       c = lerpColor(color(50), color(#6965D6), per);
       //println("raining but letting up");
     } else if (timeP < rainLasts + sunLasts *.7) {
       c = color(#6965D6);
-      println("nice sky");
+      //println("nice sky");
     } else {
       float per = map(timeP, rainLasts + sunLasts *.7, rainLasts + sunLasts, 0, 1);
       c = lerpColor(color(#6965D6), color(50), per);
-      println("not raining but getting closer");
+      //println("not raining but getting closer");
     }
     return c;
   }
@@ -55,8 +82,12 @@ color getBackground() {
 
 void checkThunder() {
   if (isRaining) {
-    if (!thundering) {
-      if (millis() - lastThundering > 1000 + ranTime) {
+    // if it's about to stop raining, let's just not thunder
+    if ( millis() - lastRainTime > rainLasts - 7000) {
+      thundering = false;
+      thunder = false;
+    } else if (!thundering) {
+      if (millis() - lastThundering > ranTime) {
         thundering = true;
         lastThundering = millis();
       }
@@ -81,73 +112,43 @@ void checkThunder() {
             thunderNum = 0;
             tTime = 20;
             lastThundering = millis();
-            ranTime = int(random(8000));
+            ranTime = int(random(8000, 16000));
           }
         }
       }
     }
+  } else {
+    thundering = false;
+    thunder = false;
   }
 }
-
 
 void initBackground() {
-
+  plantColor = color(#11BB7C);
+  stemStroke = color(0, 50, 0);
+  
   shotgun1 = loadImage("images/sidehousepaint1.png");
   shotgun2 = loadImage("images/sidehousepaint2.png");
-  plants = new PImage[5];
-  plants2 = new PShape[5];
-  for (int i = 0; i < 5; i ++) {
-    plants[i] = loadImage("testing/" + i + ".png");
-    plants2[i] = loadShape("testing/" + i + ".svg");
-  }
-
-  cement = loadImage("images/driveway.jpg");
+  
   fence = loadImage("images/fence.png");
-}
 
-void displayFakePlants(PGraphics s) {
-  //s.blendMode(MULTIPLY);
-  float w = 50.0;
-  for (int i = 0; i < 40; i ++) {
-    float factor = w/plants2[i%plants2.length].width;
-    s.pushMatrix();
-    s.translate(noise(i+1)*width*1.5-300, s.height-plants2[i%plants2.length].height*factor, noise(i*50)*500*-1);
-
-    //s.image(plants[i], 0, 0, 100, plants[i].height*factor);
-    plants2[i%plants2.length].disableStyle();
-    s.noStroke();
-    s.strokeWeight(1);
-    s.fill(0, noise(i*40)*200+50, 0);
-    s.shape(plants2[i%plants2.length], 0, 0, w, plants2[i%plants2.length].height*factor);
-    //s.beginShape();
-    //s.textureMode(NORMAL);
-    //s.texture(plants[i]);
-    //s.vertex(0, 0, 0, 0);
-    //s.vertex(100, 0, 1.0, 0);
-    //s.vertex(100, plants[i].height*factor, 1.0, 1.0);
-    //s.vertex(0, plants[i].height*factor, 0, 1.0);
-    //s.endShape();
-    s.popMatrix();
-  }
-  s.blendMode(BLEND);
+  minim = new Minim(this);
+  thunderSound = minim.loadFile("sounds/thunderSound.mp3");
+  rainSound = minim.loadFile("sounds/rainSound.mp3");
+  windSound = minim.loadFile("sounds/windSound.mp3");
+  windSound.loop();
 }
 
 void displayHouse(PGraphics s, int z ) {
   s.pushMatrix();
-  //s.scale(2);
 
-  float w = 2000;
+  float w = 1400;
   float factor = w/shotgun2.width;
   float h = shotgun2.height*factor;
 
-  s.translate(0, s.height-h-150, z);
+  s.translate(0, -200, z);
 
   displayCement(s, z-1);
-
-
-  //for (int i = -s.width; i < s.width*2; i+= cement.width) {
-  //  s.image(cement, i, 300);
-  //}
 
   s.pushMatrix();
   s.translate(-900, -200);
@@ -161,14 +162,14 @@ void displayHouse(PGraphics s, int z ) {
   s.image(shotgun2, 0, 0, w, h);
   s.popMatrix();
 
-  //drawFence(s, z);
+  drawFence(s, z);
 
   s.popMatrix();
 }
 
 void drawFence(PGraphics s, int z) {
   s.pushMatrix();
-  s.translate(0, -200);
+  s.translate(0, -300);
   float fenceH = 400;
   float factor = fenceH/fence.height;
   for (int i = int(s.width); i < s.width*2; i+= fence.width*factor) {

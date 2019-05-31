@@ -2,8 +2,8 @@ int lifeTimeSeconds = 10; // 3 minutes
 int lifeTimeFrames = lifeTimeSeconds*60; // 60 frames / second 
 float ageInc = 1.0/lifeTimeFrames;
 int plantID = 0;
-
-
+color plantColor;
+color stemStroke;
 
 class Plant {
 
@@ -11,9 +11,12 @@ class Plant {
 
   // age
   float age = 0;
-  float ageDeath = 1.0;
-  float ageGrowthStops = 0.8;
+  float ageDeath = random(1.0, 1.3);
+  float ageGrowthStops = 0.9;
   float  bloomAge = 0.6;
+  boolean dies = true;
+  boolean alive = true;
+  boolean respawns = false;
 
   // growth and height
   float growthRate = random(ageInc - ageInc*.2, ageInc + ageInc * .2);
@@ -32,29 +35,33 @@ class Plant {
   boolean isFlowering = false;
   boolean branching = false;
 
-  color col = color(random(150, 255));
+  color col;
 
 
   // randomish noise
   float yoff = 0;
   int seed = plantID;
 
-  public Plant (int x, int y, int z, float age) {
+
+  public Plant(PVector loc, float age, boolean dies) {
+    this(int(loc.x), height, int(loc.y), age, -1);
+    this.dies = dies;
+  }
+
+  public Plant(PVector loc, float age, int code) {
+    this(int(loc.x), height, int(loc.y), age, code);
+  }
+
+  public Plant (int x, int y, int z) {
+    this(x, y, z, 0, -1);
+  }
+
+  public Plant (int x, int y, int z, float age, int code) {
     this.x = x;
     this.y = y;
     this.z = z;
-    this.age = age;
-    this.age = constrain(this.age, 0, 1);
-    plantHeight = lifeTimeFrames * growthRate * constrain(age, 0, ageGrowthStops);
-    id = plantID++;
-  }
-  
-  public Plant (int x, int y, int z) {
-    this(x, y, z, 0);
-  }
-  
-  public Plant(PVector loc, float age) {
-    this(int(loc.x), height, int(loc.y), age);
+    id = code;
+    col = color(0, random(150, 255), 0);
   }
 
   public void display(PGraphics s) {
@@ -74,25 +81,41 @@ class Plant {
     s.popMatrix();
   }
 
-  public void grow() {
-    if (age < 1.0) {
+  public void getOlder() {
+    if (age < ageDeath) {
       age += ageInc;
+    } else {
+      if (respawns) respawn();
+      else if (dies) alive = false;
+    }
+  }
+
+  public void grow() {
+    getOlder();
+    if (age > bloomAge) {
+      isFlowering = true;
+    }
+    if (age < ageGrowthStops) {
       plantHeight += growthRate;
     }
   }
 
-  
+  void respawn() {
+    age = 0;
+    plantHeight = 0;
+  }
+
 
   void branch(PGraphics s, float len) {
     // Each branch will be 2/3rds the size of the previous one
     float sw = map(len, 2, 120, 1, 10);
-    s.strokeWeight(sw);
-    s.noStroke();
+    //s.strokeWeight(sw);
+    //s.noStroke();
     //s.line(0, 0, 0, -len);
-    s.fill(col);
+    //s.fill(col);
     //s.rect(0, 0, sw, -len);
     s.beginShape(QUADS);
-    s.fill(constrain(numBranch*40, 0, 255), 255, 0);
+    //s.fill(constrain(numBranch*40, 0, 255), 255, 0);
     s.vertex(0, 0);
     s.vertex(sw, 0);
     s.vertex(sw, -len);
@@ -116,9 +139,8 @@ class Plant {
     }
   }
 
-  void stem(PGraphics s, float plantH, float ang, float stemAge) {
+  void stem(PGraphics s, float plantH, float ang, float stemAge, color stCol) {
     s.pushMatrix();
-    //while (len > 2) {
     float len = 1.0* plantH / numSegments; 
     for (int i = 0; i < numSegments; i++) {
       numBranch++;
@@ -131,9 +153,16 @@ class Plant {
       s.rotate(angle);   
       float sw = map(i, 0, numSegments, 10, 1)*plantHeight;
       sw = constrain(sw, 1, 10);
-      s.noStroke();
+      //s.noStroke();
+      s.stroke(stCol);
+      s.strokeWeight(1);
+      float per = map(numBranch, 0, numSegments, 0, .5);
+      per = constrain(per, 0, 1);
+      s.fill(lerpColor(col, color(255, 255, 0), per ));
+      s.fill(col);
       s.beginShape(QUADS);
-      s.fill(constrain(numBranch*40, 0, 255), 255, 0);
+      //s.fill(constrain(numBranch*40, 0, 255), 255, 0);
+      //s.stroke(0);
       s.vertex(-sw/2, 0);
       s.vertex(sw/2, 0);
       s.vertex(sw/2, -len);
@@ -145,7 +174,7 @@ class Plant {
       }
       if (hasLeaves) {
         s.pushMatrix();
-        s.translate(0, -len);
+        s.translate(0, -len, 0.2);
         leaf(i, s);
         s.popMatrix();
       }
@@ -204,7 +233,7 @@ public class PlantFile {
   }
 
   void display(float _x, float _y, float _r, float _sc, boolean _isF, PGraphics s) {
-    img.disableStyle();
+    //img.disableStyle();
     s.pushMatrix();
 
     boolean f = false;

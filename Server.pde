@@ -42,7 +42,7 @@ public class PlantServer extends WebSocketServer {
 
   @Override
     public void onOpen( WebSocket conn, ClientHandshake handshake ) {
-    this.sendToAll( "new connection: " +  handshake.getResourceDescriptor() );
+    //this.sendToAll( "new connection: " +  handshake.getResourceDescrtiptor() );
     System.out.println( conn + " entered the room!" );
     clientLocations.put(conn, new ClientLoc());
   }
@@ -177,9 +177,12 @@ class ClientLoc {
       break;
     }
     s.pushMatrix();
-    s.translate(loc.x, s.height - 100, loc.y);
-    //s.image(shovel, 0, 0, 100, 100);
-    s.ellipse(0, 0, 50, 50);
+    float shovelH = 300;
+    float factor = 1.0* shovelH/shovel.height;
+
+    s.translate(loc.x, s.height - shovelH, loc.y);
+    
+    s.shape(shovel, 0, 0, shovel.width*factor, shovelH);
     s.popMatrix();
   }
 }
