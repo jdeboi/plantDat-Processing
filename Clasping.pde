@@ -49,7 +49,6 @@ class Clasping extends Plant {
     s.pushMatrix();
     s.translate(x, y, z);
     //s.rotateX(radians(25));
-    s.rotateX(radians((-groundRot)));
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);
@@ -101,7 +100,9 @@ class Clasping extends Plant {
   void stem(PGraphics s, float plantH, float ang, float stemAge) {
     s.pushMatrix();
     //while (len > 2) {
+      
     float len = 1.0* plantH / numSegments; 
+    s.translate(0, len);
     for (int i = 0; i < numSegments; i++) {
       numBranch++;
 

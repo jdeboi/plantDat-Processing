@@ -150,7 +150,9 @@ class Plant {
 
   void stem(PGraphics s, float plantH, float ang, float stemAge, color stCol) {
     s.pushMatrix();
+    
     float len = 1.0* plantH / numSegments; 
+    s.translate(0, len);
     for (int i = 0; i < numSegments; i++) {
       numBranch++;
 

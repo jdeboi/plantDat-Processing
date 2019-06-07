@@ -1,16 +1,8 @@
-boolean flipScreen = false;
+boolean FLIP_SCREEN = false;
+boolean TESTING = false;
+int MAX_SPAWNED = 8;
 
 PGraphics canvas;
-float windAngle = 0;
-float windNoise = 0;
-float groundRot = -45;
-
-//Beauty[] beauty;
-//Stokes[] stokes;
-//Lizard[] lizards;
-//Clasping[] clasping;
-//Obedient[] obedient;
-
 
 void setup() {
   //size(1200, 900, P3D);
@@ -38,6 +30,11 @@ void setup() {
   initDrops();
 
 
+  if (TESTING) {
+    spawnFakePlants();
+    testingVals();
+  }
+
   smooth(4);
 }
 
@@ -49,7 +46,7 @@ void draw() {
   canvas.smooth(8);
   canvas.beginDraw();
   canvas.smooth(8);
-  if (flipScreen) {
+  if (FLIP_SCREEN) {
     canvas.translate(canvas.width/2, canvas.height/2);
     canvas.rotateZ(radians(180));
     canvas.translate(-canvas.width/2, -canvas.height/2);
@@ -70,7 +67,7 @@ void draw() {
   displayLiveSpawn(canvas);
 
   // utility
-  displayBoundaries(canvas);
+  if (TESTING) displayBoundaries(canvas);
 
   // water
   displayWater(canvas, -370);
@@ -85,7 +82,7 @@ void draw() {
   renderScreens();
   update();
 
-  displayFrames();
+  if (TESTING) displayFrames();
 }
 
 void update() {
@@ -119,4 +116,10 @@ void keyPressed() {
     //saveMappedLines();
   } else if (key == 'l')
     loadKeystone();
+}
+
+void testingVals() {
+  lifeTimeSeconds = 10;
+  rainLasts = 10*1000;
+  sunLasts = 10*1000;
 }

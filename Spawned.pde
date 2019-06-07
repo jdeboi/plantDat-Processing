@@ -66,8 +66,6 @@ void removeDeadPlants() {
   //}
 }
 
-void displayPermPlants() {
-}
 
 
 void incSpawnedFloat() {
@@ -160,42 +158,70 @@ PVector getSpawnedXY(float x, float y) {
   float zMin = -1799;
   float zMax = 0;
   float newZ = map(y, 0, 100, zMin, zMax);
-  float newY =  map(y, 100, 0, canvas.height-50, -100);
+  float newY =  map(y, 100, 0, canvas.height-20, -100);
   float newX = map(x, 0, 100, newZ*.6 + 15, canvas.width-newZ*.55-80);
   return new PVector(newX, newY, newZ);
 }
 
 void reduceWaterPlants() {
-  for (Plant p : spawnedPlants) {
-    PVector temp = getWaterLoc(p.x, p.z);
-    reduceWater(int(temp.x), int(temp.y));
+  if (TESTING) {
+    for (Plant p : permPlants) {
+      PVector temp = getWaterLoc(p.x, p.y, p.z);
+      reduceWater(int(temp.x), int(temp.y), p.plantHeight);
+    }
+  } else {
+    for (Plant p : spawnedPlants) {
+      PVector temp = getWaterLoc(p.x, p.y, p.z);
+      reduceWater(int(temp.x), int(temp.y), p.plantHeight);
+    }
   }
 }
 
-PVector getWaterLoc(float x, float z) {
+PVector getWaterLoc(float x, float y, float z) {
   float zMin = -1799;
   float zMax = 0;
-  float minX = map(z, zMax, zMin, 20, 11);
-  float maxX = map(z, zMax, zMin, 33, 42);
+  float minX = map(z, zMax, zMin, 22, 8);
+  float maxX = map(z, zMax, zMin, 32, 45);
   float minY = 0;
   float maxY = 25;
 
   float newX = map(x, z*.6 + 15, canvas.width-z*.55-80, minX, maxX);
   float newY = map(z, zMax, zMin, maxY, minY);
 
+  //float dis = sqrt(y*y + z *z);
+  //float newY = map(dis, 0, rowsTerr*spacingTerr*(3.0/4.0), rowsTerr*(1.0/4), rowsTerr);
+  //newY = constrain(newY, 0, rowsTerr-1);
+
+  //float newX = colsTerr/2 - (x - canvas.width/2)*1.0/spacingTerr; 
+  //newX = constrain(newX, 0, colsTerr-1);
+
   return new PVector(newX, newY);
+}
+
+void spawnFakePlants() {
+  int i = 0;
+  for (int x = 0; x <= 100; x += 25) {
+    for (int y = 0; y <= 100; y+= 25) {
+      if (i%5 == 0) permPlants.add(new Stokes(getSpawnedXY(x, y), 1.0, false));
+      else if (i%5 == 1) permPlants.add(new Lizard(getSpawnedXY(x, y), 1.0, false));
+      else if (i%5 == 2) permPlants.add(new Beauty(getSpawnedXY(x, y), 1.0, false));
+      else if (i%5 == 3) permPlants.add(new Clasping(getSpawnedXY(x, y), 1.0, false));
+      else if (i%5 == 4) permPlants.add(new Obedient(getSpawnedXY(x, y), 1.0, false));
+      i++;
+    }
+  }
 }
 
 void displayBoundaries(PGraphics s) {
   PVector temp;
-  for (int x = 0; x <= 100; x += 50) {
-    for (int y = 0; y <= 100; y+= 50) {
+  for (int x = 0; x <= 100; x += 25) {
+    for (int y = 0; y <= 100; y+= 25) {
       temp = getSpawnedXY(x, y);
       s.pushMatrix();
       s.fill(255, 0, y*100);
       s.translate(temp.x, temp.y, temp.z);
-      PVector temp2 = getWaterLoc(temp.x, temp.z);
-      reduceWater(int(temp2.x), int(temp2.y));
+      PVector temp2 = getWaterLoc(temp.x, temp.y, temp.z);
+      //reduceWater(int(temp2.x), int(temp2.y), (millis()/4000.0)%1);
       s.ellipse(0, 0, 30, 30);
       s.popMatrix();
     }

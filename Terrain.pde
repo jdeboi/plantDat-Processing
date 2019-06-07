@@ -78,13 +78,13 @@ void setGridTerrain() {
     }
     yoff += xoffInc;
   }
-  //reduceWaterPlants();
+  reduceWaterPlants();
 }
 
-void reduceWater(int x, int y) {
+void reduceWater(int x, int y, float plantH) {
   if (x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length) {
-    float localMin = terrain[x][y]-150;
-    int area = 3;
+    float localMin = terrain[x][y]-150*plantH;
+    int area = 4;
     float maxD = area/2.0 * sqrt(2);
 
     for (int startx = x-area/2; startx < x + area/2; startx++) {
@@ -172,7 +172,7 @@ void displayWater(PGraphics s, int z) {
   s.fill(255, 170);
   //s.stroke(0, 0, 255, 90);
   //s.stroke(#FF00EF, 0);
-  noStroke();
+  s.noStroke();
   s.strokeWeight(1);
 
   s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr*(3.0/4));

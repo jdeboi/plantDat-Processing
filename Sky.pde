@@ -1,5 +1,5 @@
-int rainLasts = 1*10*1000;
-int sunLasts = 1*10*1000;
+int rainLasts = 1*60*1000;
+int sunLasts = 1*60*1000;
 long lastRainTime = 0;
 
 PImage shotgun1, shotgun2;
@@ -16,6 +16,9 @@ long lastThunder = 0;
 int thunderNum = 0;
 long ranTime = 0;
 int tTime = 20;
+
+float windAngle = 0;
+float windNoise = 0;
 
 
 color startDayColor, midDayColor, endDayColor;
@@ -360,7 +363,7 @@ void setWater() {
   float lowestSea = -150;
   float maxs = 200;
   
-  float maxSea = map(spawnedFloat, 0, 6, maxs, -120);
+  float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
   maxSea = constrain(maxSea, -100, maxs);
   if (isRaining) {
 
@@ -377,7 +380,7 @@ void setWater() {
 
 void wind() {
   //float windForce = map(mouseX, 0, width, -PI/7, PI/7);
-  float windForce = map(noise(0, flyingTerr), 0, 1, -PI/7, PI/7);
+  float windForce = map(noise(0, flyingTerr), 0, 1, -PI/15, PI/15);
   //windAngle =  windForce + windForce/4 * 2*PI * sin(mouseX/1000.0);
   windAngle =  windForce + windForce/4 *sin(map(noise(0, flyingTerr), 0, 1, 0, width)/1000.0);
 }
