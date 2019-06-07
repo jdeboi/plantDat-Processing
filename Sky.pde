@@ -1,5 +1,5 @@
-int rainLasts = 1*60*1000;
-int sunLasts = 1*60*1000;
+int rainLasts = 1*10*1000;
+int sunLasts = 1*10*1000;
 long lastRainTime = 0;
 
 PImage shotgun1, shotgun2;
@@ -16,6 +16,9 @@ long lastThunder = 0;
 int thunderNum = 0;
 long ranTime = 0;
 int tTime = 20;
+
+
+color startDayColor, midDayColor, endDayColor;
 
 
 import ddf.minim.*;
@@ -66,14 +69,27 @@ color getBackground() {
       //println("raining");
     } else if (timeP < rainLasts) {
       float per = map(timeP, rainLasts*.7, rainLasts, 0, 1);
-      c = lerpColor(color(50), color(#6965D6), per);
+      //c = lerpColor(color(50), startDayColor, per);
+      c = lerpColor(color(50), endDayColor, per);
       //println("raining but letting up");
     } else if (timeP < rainLasts + sunLasts *.7) {
-      c = color(#6965D6);
+      //float per = map(timeP, rainLasts, rainLasts + sunLasts *.7, 0, 1.0);
+      //if (per < 0.5) c = startDayColor;
+      //else if (per < 0.6) {
+      //  float per2 = map(per, .5, .6, 0, 1);
+      //  c = lerpColor(startDayColor, midDayColor, per2);
+      //} else if (per < 0.7) {
+      //  float per2 = map(per, .6, .7, 0, 1);
+      //  c = lerpColor(midDayColor, endDayColor, per2);
+      //}
+      //else {
+      //  c = endDayColor;
+      //}
+      c = endDayColor;
       //println("nice sky");
     } else {
       float per = map(timeP, rainLasts + sunLasts *.7, rainLasts + sunLasts, 0, 1);
-      c = lerpColor(color(#6965D6), color(50), per);
+      c = lerpColor(endDayColor, color(50), per);
       //println("not raining but getting closer");
     }
     return c;
@@ -126,6 +142,9 @@ void checkThunder() {
 void initBackground() {
   plantColor = color(#11BB7C);
   stemStroke = color(0, 50, 0);
+  startDayColor = color(#BCF5FF);
+  midDayColor = color(#FFB4EE);
+  endDayColor = color(#6965D6);
   
   shotgun1 = loadImage("images/sidehousepaint1.png");
   shotgun2 = loadImage("images/sidehousepaint2.png");
@@ -142,23 +161,24 @@ void initBackground() {
 void displayHouse(PGraphics s, int z ) {
   s.pushMatrix();
 
-  float w = 1500;
+  float w = s.width*1.1;
+  float down = -340;
   float factor = w/shotgun2.width;
   float h = shotgun2.height*factor;
 
-  s.translate(0, -200, z);
+  s.translate(0, down, z);
 
   displayCement(s, z-1);
-  drawFence(s, z);
+  //drawFence(s, z);
 
   s.pushMatrix();
-  s.translate(-600, -200);
+  s.translate(-s.width*.55, down);
   s.rotate(radians(0));
   s.image(shotgun1, 0, 0, w, h);
   s.popMatrix();
 
   s.pushMatrix();
-  s.translate(600, -200);
+  s.translate(s.width*.3, down);
   s.rotate(radians(0));
   s.image(shotgun2, 0, 0, w, h);
   s.popMatrix();
@@ -231,7 +251,7 @@ void displaySky(PGraphics s) {
 
 void displayCement(PGraphics s, int z) {
   s.pushMatrix();
-  s.translate(-s.width, 230, z);
+  s.translate(-s.width*2, -350, z);
   s.noStroke();
   //s.rotateX(radians(90));
   s.fill(cementColor);
@@ -240,8 +260,8 @@ void displayCement(PGraphics s, int z) {
   s.beginShape();
   //s.texture(cement);
   s.vertex(-s.width, 0, 0, 0);
-  s.vertex(s.width*4, 0, 1, 0);
-  s.vertex(s.width*4, s.height*2, 1, 1);
+  s.vertex(s.width*6, 0, 1, 0);
+  s.vertex(s.width*6, s.height*2, 1, 1);
   s.vertex(-s.width, s.height*2, 0, 1);
   s.endShape();
   s.popMatrix();
@@ -338,10 +358,9 @@ void waterOff() {
 void setWater() {
   incSpawnedFloat();
   float lowestSea = -150;
-  //float maxSea = 200;
-  //waterMax = int(35 + 300*sin(millis()/1000.0));
-  float maxs = 250;
-  float maxSea = map(spawnedFloat, 0, 14, maxs, -120);
+  float maxs = 200;
+  
+  float maxSea = map(spawnedFloat, 0, 6, maxs, -120);
   maxSea = constrain(maxSea, -100, maxs);
   if (isRaining) {
 

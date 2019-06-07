@@ -18,7 +18,7 @@ class Grasses {
     grasses = new ArrayList<GrassBlade>();
     for (int i = 0; i < num; i++) {
       PVector loc = getSpawnedXY(random(100), random(100));
-      grasses.add(new GrassBlade(int(loc.x), y, int(loc.y)));
+      grasses.add(new GrassBlade(int(loc.x), int(loc.y), int(loc.z)));
     }
   }
 
@@ -46,7 +46,7 @@ class GrassBlade extends Plant {
   GrassBlade(int x, int y, int z) {
     super(x, y, z);
     id = GRASS_ID++;
-    growthScaler = 100;
+    growthScaler = random(100, 140);
     branching = false;
     hasLeaves = false;
     respawns = true;
@@ -58,7 +58,7 @@ class GrassBlade extends Plant {
   void display(PGraphics s) {
     s.pushMatrix();
     s.translate(x, y, z);
-    s.rotateX(radians(25));
+    //s.rotateX(radians((-groundRot)));
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);

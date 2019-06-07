@@ -174,7 +174,7 @@ class ClientLoc {
     float shovelH = 300;
     float factor = 1.0* shovelH/shovel.height;
     float shovelW = shovel.width*factor;
-    s.translate(loc.x, s.height - shovelH, loc.y);
+    s.translate(loc.x-shovelW/2, loc.y - shovelH, loc.z);
     //s.rotateX(25);
     s.fill(c);
     s.noStroke();

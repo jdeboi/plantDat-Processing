@@ -1,4 +1,4 @@
-import deadpixel.keystone.*;  
+import keystoneMap.*;
 Keystone ks;
 CornerPinSurface surface;
 boolean isCalibrating = true;
@@ -6,8 +6,8 @@ boolean isCalibrating = true;
 void initScreens() {
   ks = new Keystone(this);
   
-  surface = ks.createCornerPinSurface(width, height, 20);
-  canvas = createGraphics(width, height, P3D);
+  surface = ks.createQuadPinSurface(850, 800, 20);
+  canvas = createGraphics(900, 850, P3D);
 }
 
 void saveKeystone() {

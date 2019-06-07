@@ -1,4 +1,4 @@
-int lifeTimeSeconds = 10; // 3 minutes
+int lifeTimeSeconds = 60; // 3 minutes
 int lifeTimeFrames = lifeTimeSeconds*60; // 60 frames / second 
 float ageInc = 1.0/lifeTimeFrames;
 int plantID = 0;
@@ -43,12 +43,12 @@ class Plant {
 
 
   public Plant(PVector loc, float age, boolean dies) {
-    this(int(loc.x), height, int(loc.y), age, -1);
+    this(int(loc.x), int(loc.y), int(loc.z), age, -1);
     this.dies = dies;
   }
 
   public Plant(PVector loc, float age, int code) {
-    this(int(loc.x), height, int(loc.y), age, code);
+    this(int(loc.x), int(loc.y), int(loc.z), age, code);
   }
 
   public Plant (int x, int y, int z) {

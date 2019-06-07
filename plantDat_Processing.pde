@@ -1,8 +1,9 @@
-
+boolean flipScreen = false;
 
 PGraphics canvas;
 float windAngle = 0;
 float windNoise = 0;
+float groundRot = -45;
 
 //Beauty[] beauty;
 //Stokes[] stokes;
@@ -18,7 +19,7 @@ void setup() {
   canvas = createGraphics (width, height, P3D);
   initScreens();
   initServer();
-  
+
   // plant files
   initBeauty();
   initStokes();
@@ -26,7 +27,7 @@ void setup() {
   initClasping();
   initObedient();
   initSpawned();
-  
+
   // permanent plants
   initGrasses();
   initPermPlants();
@@ -41,40 +42,44 @@ void setup() {
 }
 
 void draw() {
-  background(255);
+  background(0);
 
 
 
-  canvas.smooth(4);
+  canvas.smooth(8);
   canvas.beginDraw();
-
+  canvas.smooth(8);
+  if (flipScreen) {
+    canvas.translate(canvas.width/2, canvas.height/2);
+    canvas.rotateZ(radians(180));
+    canvas.translate(-canvas.width/2, -canvas.height/2);
+  }
   canvas.background(getBackground());
 
-  displayHouse(canvas, -1300);
+  displayHouse(canvas, -1800);
 
-  canvas.pushMatrix();
-  canvas.rotateX(radians(-25));
-  canvas.translate(0, 0, 300);
 
   // ground
   displayGroundTerrain(canvas, -650);
-  displayGrass(canvas, grasses);
+
 
   // plants
+  displayGrass(canvas, grasses);
   displaySpawned(canvas);
   displayPermanent(canvas);
   displayLiveSpawn(canvas);
-  
+
   // utility
-  //displayBoundaries(canvas);
-  
+  displayBoundaries(canvas);
+
   // water
   displayWater(canvas, -370);
 
-  canvas.popMatrix();
 
-
+  // weather
+  //displayClouds(canvas, -1570);
   displayRain(canvas);
+
   canvas.endDraw();
 
   renderScreens();
@@ -92,8 +97,8 @@ void update() {
   // the elements
   checkThunder();
   checkRain();
-  //setWater();
-  waterOff();
+  setWater();
+  //waterOff();
   setGridTerrain();
   wind();
   playSounds();
@@ -103,4 +108,15 @@ void displayFrames() {
   fill(0);
   stroke(255, 0, 0);
   text(frameRate, 10, 50);
+}
+
+void keyPressed() {
+  if (key == 'c')
+    toggleCalibration();
+  else if (key == 's') {
+    saveKeystone();
+    //mask.saveMask();
+    //saveMappedLines();
+  } else if (key == 'l')
+    loadKeystone();
 }

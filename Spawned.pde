@@ -9,7 +9,7 @@ PShape shovel;
 
 void initPermPlants() {
   permPlants = new ArrayList<Plant>();
-  
+
   // right side plants
   permPlants.add(new Lizard(getSpawnedXY(82, -15), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(85, 0), 1.0, false));
@@ -20,7 +20,7 @@ void initPermPlants() {
   permPlants.add(new Lizard(getSpawnedXY(95, 0), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(97, -20), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(100, 0), 1.0, false));
-  
+
   // left side plants
   permPlants.add(new Lizard(getSpawnedXY(0, -15), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(2, -20), 1.0, false));
@@ -29,7 +29,8 @@ void initPermPlants() {
   permPlants.add(new Lizard(getSpawnedXY(7, -5), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(10, -10), 1.0, false));
   permPlants.add(new Lizard(getSpawnedXY(12, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(13, -20), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(15, -12), 1.0, false));
+  permPlants.add(new Lizard(getSpawnedXY(18, 0), 1.0, false));
 }
 
 void displaySpawned(PGraphics s) {
@@ -55,6 +56,7 @@ void removeDeadPlants() {
     if (!spawnedPlants.get(i).alive) {
       //int code = spawnedPlants.get(i).id;
       spawnedPlants.remove(i);
+      println("removed old plant");
       // can forsee an issue where time delay means plant will respawn, flash, based on timing differences of web app and this program
       //spawnedPlantIDs.remove(code);
     } else {
@@ -101,6 +103,8 @@ void requestData() {
     if (!spawnedPlantIDs.containsKey(code)) {
       addNewPlant(pObj, code);
       spawnedPlantIDs.put(code, 1);
+    } else {
+      //println(code, " already exists");
     }
   }
 }
@@ -113,18 +117,26 @@ void addNewPlant(JSONObject pObj, int code) {
   int x = plant.getInt("x");
   int y = plant.getInt("y");
   PVector xy = getSpawnedXY(x, y);
+
   if (name.equals("Lizard's Tail")) {
     spawnedPlants.add(new Lizard(xy, age, code));
-  } else if (name.equals("Beauty Berry")) {
+    println("added new plant", name);
+  } else if (name.equals("American Beautyberry")) {
+    println("asd");
     spawnedPlants.add(new Beauty(xy, age, code));
+    println("added new plant", name);
   } else if (name.equals("Clasping Cone Flower")) {
     spawnedPlants.add(new Clasping(xy, age, code));
-  } else if (name.equals("Obedient Plant")) {
+    println("added new plant", name);
+  } else if (name.equals("Correll’s Obedient Plant")) {
     spawnedPlants.add(new Obedient(xy, age, code));
+    println("added new plant", name);
   } else if (name.equals("Stokes Aster")) {
     spawnedPlants.add(new Stokes(xy, age, code));
+    println("added new plant", name);
   }
-  println("added new plant", name);
+
+  println("Num spawned plants: ", spawnedPlants.size());
 }
 
 void displaySpawnedPlants(PGraphics s) {
@@ -143,51 +155,49 @@ void displaySpawnedPlants(PGraphics s) {
   }
 }
 
+// remeber that y is zero at the top of the screen...
 PVector getSpawnedXY(float x, float y) {
-  float zMin = -1120;
+  float zMin = -1799;
   float zMax = 0;
   float newZ = map(y, 0, 100, zMin, zMax);
-  float newX = map(x, 0, 100, newZ*.85, width-newZ*.85);
-  return new PVector(newX, newZ);
+  float newY =  map(y, 100, 0, canvas.height-50, -100);
+  float newX = map(x, 0, 100, newZ*.6 + 15, canvas.width-newZ*.55-80);
+  return new PVector(newX, newY, newZ);
+}
+
+void reduceWaterPlants() {
+  for (Plant p : spawnedPlants) {
+    PVector temp = getWaterLoc(p.x, p.z);
+    reduceWater(int(temp.x), int(temp.y));
+  }
+}
+
+PVector getWaterLoc(float x, float z) {
+  float zMin = -1799;
+  float zMax = 0;
+  float minX = map(z, zMax, zMin, 20, 11);
+  float maxX = map(z, zMax, zMin, 33, 42);
+  float minY = 0;
+  float maxY = 25;
+
+  float newX = map(x, z*.6 + 15, canvas.width-z*.55-80, minX, maxX);
+  float newY = map(z, zMax, zMin, maxY, minY);
+
+  return new PVector(newX, newY);
 }
 
 void displayBoundaries(PGraphics s) {
   PVector temp;
-  temp = getSpawnedXY(0, 0);
-  s.fill(255, 0, 0);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-
-  temp = getSpawnedXY(100, 0);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-  temp = getSpawnedXY(100, 100);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-  temp = getSpawnedXY(0, 100);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-  temp = getSpawnedXY(50, 50);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-  temp = getSpawnedXY(50, 0);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
-  temp = getSpawnedXY(50, 100);
-  s.pushMatrix();
-  s.translate(temp.x, s.height - 20, temp.y);
-  s.ellipse(0, 0, 30, 30);
-  s.popMatrix();
+  for (int x = 0; x <= 100; x += 50) {
+    for (int y = 0; y <= 100; y+= 50) {
+      temp = getSpawnedXY(x, y);
+      s.pushMatrix();
+      s.fill(255, 0, y*100);
+      s.translate(temp.x, temp.y, temp.z);
+      PVector temp2 = getWaterLoc(temp.x, temp.z);
+      reduceWater(int(temp2.x), int(temp2.y));
+      s.ellipse(0, 0, 30, 30);
+      s.popMatrix();
+    }
+  }
 }

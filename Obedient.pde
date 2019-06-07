@@ -46,7 +46,7 @@ class Obedient extends Plant {
     //s.stroke(col);
     s.pushMatrix();
     s.translate(x, y, z);
-    s.rotateX(radians(25));
+    //s.rotateX(radians(25));
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);
@@ -96,6 +96,7 @@ class Obedient extends Plant {
 
   void stem(PGraphics s, float plantH, float ang, float stemAge) {
     s.pushMatrix();
+    s.strokeWeight(1);
     //while (len > 2) {
     float len = 1.0* plantH / numSegments; 
     for (int i = 0; i < numSegments; i++) {
