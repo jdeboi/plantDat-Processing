@@ -1,6 +1,6 @@
 boolean FLIP_SCREEN = false;
 boolean TESTING = false;
-int MAX_SPAWNED = 8;
+int MAX_SPAWNED = 20;
 
 PGraphics canvas;
 
@@ -8,7 +8,6 @@ void setup() {
   //size(1200, 900, P3D);
   fullScreen(P3D);
 
-  canvas = createGraphics (width, height, P3D);
   initScreens();
   initServer();
 
@@ -29,9 +28,10 @@ void setup() {
   initTerrain();
   initDrops();
 
-
+  //spawnFakePlants();
+  
   if (TESTING) {
-    spawnFakePlants();
+    //spawnFakePlants();
     testingVals();
   }
 
@@ -90,6 +90,7 @@ void update() {
   checkForSpawned(1000);
   grasses.grow();
   removeDeadPlants();
+  spawnRecurringPlants(1000*15);
 
   // the elements
   checkThunder();

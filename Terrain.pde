@@ -28,8 +28,8 @@ PGraphics maskGraphics, tempGraphics;
 void initTerrain() {
   //int w = 1840; 
   //int h = 1400; 
-  int w = int(width*3);
-  int h = height*3;
+  int w = int(1440*3);
+  int h = 900*3;
   int spacing = 80;
   this.colsTerr = w/spacing;
   this.rowsTerr = h/spacing;

@@ -254,7 +254,7 @@ void displaySky(PGraphics s) {
 
 void displayCement(PGraphics s, int z) {
   s.pushMatrix();
-  s.translate(-s.width*2, -350, z);
+  s.translate(-s.width*2, -450, z);
   s.noStroke();
   //s.rotateX(radians(90));
   s.fill(cementColor);

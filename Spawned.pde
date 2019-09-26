@@ -156,10 +156,10 @@ void displaySpawnedPlants(PGraphics s) {
 // remeber that y is zero at the top of the screen...
 PVector getSpawnedXY(float x, float y) {
   float zMin = -1799;
-  float zMax = 0;
+  float zMax = -50;
   float newZ = map(y, 0, 100, zMin, zMax);
-  float newY =  map(y, 100, 0, canvas.height-20, -100);
-  float newX = map(x, 0, 100, newZ*.6 + 15, canvas.width-newZ*.55-80);
+  float newY =  map(y, 100, 0, canvas.height+5, -20);
+  float newX = map(x, 0, 100, newZ*.56 + 15, canvas.width-newZ*.57-20);
   return new PVector(newX, newY, newZ);
 }
 
@@ -200,15 +200,27 @@ PVector getWaterLoc(float x, float y, float z) {
 
 void spawnFakePlants() {
   int i = 0;
-  for (int x = 0; x <= 100; x += 25) {
-    for (int y = 0; y <= 100; y+= 25) {
-      if (i%5 == 0) permPlants.add(new Stokes(getSpawnedXY(x, y), 1.0, false));
-      else if (i%5 == 1) permPlants.add(new Lizard(getSpawnedXY(x, y), 1.0, false));
-      else if (i%5 == 2) permPlants.add(new Beauty(getSpawnedXY(x, y), 1.0, false));
-      else if (i%5 == 3) permPlants.add(new Clasping(getSpawnedXY(x, y), 1.0, false));
-      else if (i%5 == 4) permPlants.add(new Obedient(getSpawnedXY(x, y), 1.0, false));
-      i++;
-    }
+  for (int x = 0; x <10; x ++) {
+    if (i%5 == 0) spawnedPlants.add(new Stokes(getSpawnedXY(random(100), random(100)), 1.0, false));
+    else if (i%5 == 1) spawnedPlants.add(new Lizard(getSpawnedXY(random(100), random(100)), 1.0, false));
+    else if (i%5 == 2) spawnedPlants.add(new Beauty(getSpawnedXY(random(100), random(100)), 1.0, false));
+    else if (i%5 == 3) spawnedPlants.add(new Clasping(getSpawnedXY(random(100), random(100)), 1.0, false));
+    else if (i%5 == 4) spawnedPlants.add(new Obedient(getSpawnedXY(random(100), random(100)), 1.0, false));
+    i++;
+  }
+}
+
+long recurringPlantTime = 0;
+void spawnRecurringPlants(int delayt) {
+  randomSeed(millis());
+  int i = int(random(5));
+  if (millis() - recurringPlantTime > delayt) {
+    recurringPlantTime = millis();
+    if (i == 0) spawnedPlants.add(new Stokes(getSpawnedXY(random(100), random(100)), 0, -1));
+    else if (i == 1) spawnedPlants.add(new Lizard(getSpawnedXY(random(100), random(100)), 0, -1));
+    else if (i == 2) spawnedPlants.add(new Beauty(getSpawnedXY(random(100), random(100)), 0, -1));
+    else if (i == 3) spawnedPlants.add(new Clasping(getSpawnedXY(random(100), random(100)), 0, -1));
+    else if (i == 4) spawnedPlants.add(new Obedient(getSpawnedXY(random(100), random(100)), 0, -1));
   }
 }
 
@@ -221,7 +233,7 @@ void displayBoundaries(PGraphics s) {
       s.fill(255, 0, y*100);
       s.translate(temp.x, temp.y, temp.z);
       PVector temp2 = getWaterLoc(temp.x, temp.y, temp.z);
-      //reduceWater(int(temp2.x), int(temp2.y), (millis()/4000.0)%1);
+      reduceWater(int(temp2.x), int(temp2.y), 1);
       s.ellipse(0, 0, 30, 30);
       s.popMatrix();
     }

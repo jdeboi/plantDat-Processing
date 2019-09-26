@@ -1,4 +1,4 @@
-int lifeTimeSeconds = 60; // 3 minutes
+int lifeTimeSeconds = 1*60; // 3 minutes
 int lifeTimeFrames = lifeTimeSeconds*60; // 60 frames / second 
 float ageInc = 1.0/lifeTimeFrames;
 int plantID = 0;
@@ -12,8 +12,8 @@ class Plant {
   // age
   float age = 0;
   float ageDeath;
-  float ageGrowthStops = 0.9;
-  float  bloomAge = 0.6;
+  float ageGrowthStops = 0.8;
+  float  bloomAge = 0.5;
   boolean dies = true;
   boolean alive = true;
   boolean respawns = false;
@@ -59,7 +59,7 @@ class Plant {
     this.x = x;
     this.y = y;
     this.z = z;
-    ageDeath = random(1.0, 1.3);
+    ageDeath = random(2.0, 3.0);
     growthRate = random(ageInc - ageInc*.2, ageInc + ageInc * .2);
     curveAngle = radians(random(-10, 10));
     stemAngle = radians(random(-5, 5));
