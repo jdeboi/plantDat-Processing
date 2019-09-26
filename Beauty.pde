@@ -64,7 +64,8 @@ class Beauty extends Plant {
   void berry(PGraphics s, float leafScale) {
     s.fill(235, 0, 255);
     s.stroke(255);
-    float berryAge = map(age, bloomAge, 1.0, 0, 1.0);
+    float a = constrain(age, 0, 1.1);
+    float berryAge = map(a, bloomAge, 1.0, 0, 1.0);
     float berrySize = leafScale*20*berryAge;
     int berrySpacings[][] = {{0, 0}, {-15, 13}, {7, 12}, {-9, -10}, {4, -6}};
     s.pushMatrix();

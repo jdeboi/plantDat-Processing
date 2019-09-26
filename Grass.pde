@@ -1,8 +1,11 @@
 Grasses grasses;
+Grasses grassesLeft, grassesRight;
 int GRASS_ID = 0;
 
 void initGrasses() {
-  grasses = new Grasses(-canvas.width/2, canvas.height, 150, canvas.width*2);
+  grasses = new Grasses(0, 100, 0, 100, 150);
+  grassesLeft = new Grasses(-3, 12, -40, 0, 30);
+  grassesRight = new Grasses(83, 103, -40, 0, 50);
 }
 
 void displayGrass(PGraphics s, Grasses g) {
@@ -13,11 +16,11 @@ class Grasses {
 
   ArrayList<GrassBlade>grasses;
   int id;
-  Grasses(int x, int y, int num, int w) {
+  Grasses(int x1, int x2, int z1, int z2, int num) {
     id = 0;
     grasses = new ArrayList<GrassBlade>();
     for (int i = 0; i < num; i++) {
-      PVector loc = getSpawnedXY(random(100), random(100));
+      PVector loc = getSpawnedXY(random(x1, x2), random(z1, z2));
       grasses.add(new GrassBlade(int(loc.x), int(loc.y), int(loc.z)));
     }
   }

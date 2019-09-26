@@ -1,16 +1,16 @@
-boolean FLIP_SCREEN = false;
 boolean TESTING = false;
-int MAX_SPAWNED = 8;
+int MAX_SPAWNED = 20;
 
 PGraphics canvas;
 
+PVector test;
 void setup() {
-  //size(1200, 900, P3D);
-  fullScreen(P3D);
+  test = new PVector(0, 0);
+  size(1920, 1280, P3D);
+  //fullScreen(P3D);
 
-  canvas = createGraphics (width, height, P3D);
-  initScreens();
-  initServer();
+  initScreens(width, height);
+  //initServer();
 
   // plant files
   initBeauty();
@@ -20,18 +20,21 @@ void setup() {
   initObedient();
   initSpawned();
 
-  // permanent plants
-  initGrasses();
-  initPermPlants();
+
 
   // the elements
   initBackground();
   initTerrain();
   initDrops();
 
+  // permanent plants
+  initGrasses();
+  initPermPlants();
+
+  //spawnFakePlants();
 
   if (TESTING) {
-    spawnFakePlants();
+    //spawnFakePlants();
     testingVals();
   }
 
@@ -46,14 +49,9 @@ void draw() {
   canvas.smooth(8);
   canvas.beginDraw();
   canvas.smooth(8);
-  if (FLIP_SCREEN) {
-    canvas.translate(canvas.width/2, canvas.height/2);
-    canvas.rotateZ(radians(180));
-    canvas.translate(-canvas.width/2, -canvas.height/2);
-  }
   canvas.background(getBackground());
 
-  displayHouse(canvas, -1800);
+  displayHouse(canvas, int(getBackWater()) -100);
 
 
   // ground
@@ -62,12 +60,17 @@ void draw() {
 
   // plants
   displayGrass(canvas, grasses);
+  displayGrass(canvas, grassesLeft);
+  displayGrass(canvas, grassesRight);
   displaySpawned(canvas);
   displayPermanent(canvas);
-  displayLiveSpawn(canvas);
+  //displayLiveSpawn(canvas);
 
   // utility
-  if (TESTING) displayBoundaries(canvas);
+  if (TESTING) {
+    displayBoundaries(canvas);
+    displayWaterCells(canvas);
+  }
 
   // water
   displayWater(canvas, -370);
@@ -79,7 +82,9 @@ void draw() {
 
   canvas.endDraw();
 
-  renderScreens();
+  image(canvas, 0, 0);
+
+  //renderScreens();
   update();
 
   if (TESTING) displayFrames();
@@ -87,9 +92,12 @@ void draw() {
 
 void update() {
   // plants
-  checkForSpawned(1000);
+  //checkForSpawned(1000);
   grasses.grow();
+  grassesLeft.grow();
+  grassesRight.grow();
   removeDeadPlants();
+  spawnRecurringPlants(1000*3);
 
   // the elements
   checkThunder();
@@ -107,16 +115,16 @@ void displayFrames() {
   text(frameRate, 10, 50);
 }
 
-void keyPressed() {
-  if (key == 'c')
-    toggleCalibration();
-  else if (key == 's') {
-    saveKeystone();
-    //mask.saveMask();
-    //saveMappedLines();
-  } else if (key == 'l')
-    loadKeystone();
-}
+//void keyPressed() {
+//  if (key == 'c')
+//    toggleCalibration();
+//  else if (key == 's') {
+//    saveKeystone();
+//    //mask.saveMask();
+//    //saveMappedLines();
+//  } else if (key == 'l')
+//    loadKeystone();
+//}
 
 void testingVals() {
   lifeTimeSeconds = 10;

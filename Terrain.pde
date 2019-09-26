@@ -28,8 +28,8 @@ PGraphics maskGraphics, tempGraphics;
 void initTerrain() {
   //int w = 1840; 
   //int h = 1400; 
-  int w = int(width*3);
-  int h = height*3;
+  int w = int(width*3.5);
+  int h = int(height*2.2);
   int spacing = 80;
   this.colsTerr = w/spacing;
   this.rowsTerr = h/spacing;
@@ -81,24 +81,52 @@ void setGridTerrain() {
   reduceWaterPlants();
 }
 
-void reduceWater(int x, int y, float plantH) {
-  if (x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length) {
-    float localMin = terrain[x][y]-150*plantH;
-    int area = 4;
+void reduceWater(float x, float y, float z, float plantH) {
+  reduceWater(int( x), int (y), int (z), plantH);
+}
+
+void reduceWater(int x, int y, int z, float plantH) {
+  int[] rowcol = getRowCol(x, y, z);
+  /// so i messed this up b/c terrain is [x][y] which maybe should be [y][x]
+  int r = rowcol[1];
+  int c = rowcol[0];
+  if (r >= 0 && c >= 0 && r < terrain.length && c < terrain[0].length) {
+    if (TESTING) plantH = 1.0;
+    float localMin = terrain[r][c]-100* plantH;
+    int area = 5;
     float maxD = area/2.0 * sqrt(2);
 
-    for (int startx = x-area/2; startx < x + area/2; startx++) {
-      for (int starty = y-area/2; starty < y+area/2; starty++) {
-        if (startx >= 0 && startx < terrain.length && starty < terrain[0].length && starty >= 0) {
-          float temp = terrain[startx][starty];
-          float dis = dist(startx, starty, x, y);
+    for (int startc = c-area/2; startc < c + area/2; startc++) {
+      for (int startr = r-area/2; startr < r+area/2; startr++) {
+        if (startc >= 0 && startc < terrain[0].length && startr < terrain.length && startr >= 0) {
+          float temp = terrain[startr][startc];
+          float dis = dist(c, r, startc, startr);
           float newVal = map(dis, 0, maxD, localMin, temp);
-          terrain[startx][starty] = newVal;
+          terrain[startr][startc] = newVal;
         }
       }
     }
   }
 }
+
+//void reduceWater(int x, int y, float plantH) {
+//  if (x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length) {
+//    float localMin = terrain[x][y]-150*plantH;
+//    int area = 4;
+//    float maxD = area/2.0 * sqrt(2);
+
+//    for (int startx = x-area/2; startx < x + area/2; startx++) {
+//      for (int starty = y-area/2; starty < y+area/2; starty++) {
+//        if (startx >= 0 && startx < terrain.length && starty < terrain[0].length && starty >= 0) {
+//          float temp = terrain[startx][starty];
+//          float dis = dist(startx, starty, x, y);
+//          float newVal = map(dis, 0, maxD, localMin, temp);
+//          terrain[startx][starty] = newVal;
+//        }
+//      }
+//    }
+//  }
+//}
 
 
 
@@ -163,6 +191,59 @@ color getVertexHeight(float h, color start, color end, int min, int max, int alp
   return newc;
 }
 
+PVector getWaterOrigin() {
+  float x = canvas.width/2-colsTerr*spacingTerr/2;
+
+  //float y = canvas.height-30-waterY;
+  float z = getBackWater();
+  float y = getSpawnedY(z);
+  return new PVector(x, y, z);
+}
+
+int[] getRowCol(float x, float y, float z) {
+  return getRowCol(int( x), int (y), int (z));
+}
+
+int[] getRowCol(int x, int y, int z) {
+  PVector origin = getWaterOrigin();
+  float dx = x - origin.x;
+  float dy = y - origin.y;
+  float dz = z - origin.z;
+  float dhypo = sqrt(dz*dz + dy*dy);
+
+  int[] rowcol = new int[2];
+  rowcol[1] = round(dx / spacingTerr);
+  //rowcol[1] = round(map(rowcol[1], 0, colsTerr, 2, colsTerr-3));
+  rowcol[0] = round(dhypo/spacingTerr)-3;
+  return rowcol;
+}
+
+
+void displayWaterCells(PGraphics s) {
+  //PVector o = getWaterOrigin();
+  //s.pushMatrix();
+  //s.fill(255);
+  //s.translate(o.x+250, o.y, o.z);
+  //s.ellipse(0, 0, 30, 30);
+  //s.popMatrix();
+  test = getSpawnedXY(40, 40);
+  reduceWater(test.x, test.y, test.z, 1);
+  println( getRowCol(test.x, test.y, test.z));
+  s.pushMatrix();
+  s.fill(155, 255, 0);
+  s.translate(test.x, test.y, test.z);
+  s.ellipse(0, 0, 60, 60);
+  s.popMatrix();
+  
+   s.pushMatrix();
+  s.fill(0, 255, 255);
+  float y = getSpawnedY(test.z);
+  s.translate(test.x, y, test.z);
+  s.ellipse(0, 0, 40, 40);
+  s.popMatrix();
+}
+
+float waterFactor = 9.0/10;
 void displayWater(PGraphics s, int z) {
 
   s.pushMatrix();
@@ -175,7 +256,7 @@ void displayWater(PGraphics s, int z) {
   s.noStroke();
   s.strokeWeight(1);
 
-  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr*(3.0/4));
+  s.translate(-colsTerr*spacingTerr/2, -rowsTerr*spacingTerr*waterFactor);
   //s.colorMode(HSB, 255);
   for (int y = 0; y < rowsTerr-1; y++) {
     s.beginShape(TRIANGLE_STRIP);
@@ -184,10 +265,15 @@ void displayWater(PGraphics s, int z) {
       int min = waterMin;
       int max = waterMax;
       s.fill(getVertexHeight(terrain[x][y], color(0, 0, 255), color(0, 255, 255), min, max, alpha));
-      //if (y %2 == 0) s.fill(y*5, 0, 0);
-      //if (x %2 == 0) s.fill(255, x*5, 0);
-      //if (y%10 == 0) s.fill(0);
-      //if (x%10 == 0) s.fill(255);
+      if (TESTING) {
+       
+        if (y == getRowCol(test.x, test.y, test.z)[0]) s.fill(255, 0, 0);
+        if (x == getRowCol(test.x, test.y, test.z)[1]) s.fill(255, 255, 0);
+        //if (y %2 == 0) s.fill(y*5, 0, 0);
+        //if (x %2 == 0) s.fill(255, x*5, 0);
+        //if (y%10 == 0) s.fill(0);
+        //if (x%10 == 0) s.fill(255);
+      }
       s.vertex(x * spacingTerr, y * spacingTerr, terrain[x][y]);
       s.fill(getVertexHeight(terrain[x][y+1], color(0, 0, 255), color(0, 255, 255), min, max, alpha));
       s.vertex(x * spacingTerr, (y+1) * spacingTerr, terrain[x][y+1]);
@@ -234,4 +320,8 @@ void displayClouds(PGraphics s, int z) {
     s.endShape();
   }
   s.popMatrix();
+}
+
+float getBackWater() {
+  return -rowsTerr*spacingTerr*waterFactor;
 }

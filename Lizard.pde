@@ -30,6 +30,7 @@ class Lizard extends Plant {
     growthScaler = 100;
   }
 
+
   void display(PGraphics s) {
     yoff += 0.005;
     //println(seed);
@@ -39,15 +40,17 @@ class Lizard extends Plant {
     s.fill(plantColor);
     s.stroke(0);
     s.pushMatrix();
+    //s.translate(x, y, z);
     s.translate(x, y, z);
+    //println(" y " + y );
     float angle = stemAngle + windAngle/3.0;
     angle = constrain(angle, -10, 10);
     s.rotate(angle);
-    s.pushMatrix();
+    //s.pushMatrix();
     //lizardLeaves[0].display(0, 0, 0, plantHeight*.8, false, s);
     ////s.translate(8*plantHeight, random(10)*plantHeight);
     //if (random(0, 1) > 0.5) lizardLeaves[1].display(0, 0, 0, plantHeight*.6, true, s);
-    s.popMatrix();
+    //s.popMatrix();
 
 
 

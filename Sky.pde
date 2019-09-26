@@ -148,10 +148,10 @@ void initBackground() {
   startDayColor = color(#BCF5FF);
   midDayColor = color(#FFB4EE);
   endDayColor = color(#6965D6);
-  
+
   shotgun1 = loadImage("images/sidehousepaint1.png");
   shotgun2 = loadImage("images/sidehousepaint2.png");
-  
+
   fence = loadImage("images/fence.png");
 
   minim = new Minim(this);
@@ -164,8 +164,8 @@ void initBackground() {
 void displayHouse(PGraphics s, int z ) {
   s.pushMatrix();
 
-  float w = s.width*1.1;
-  float down = -340;
+  float w = s.width*1.45;
+  float down = -650;
   float factor = w/shotgun2.width;
   float h = shotgun2.height*factor;
 
@@ -175,18 +175,19 @@ void displayHouse(PGraphics s, int z ) {
   //drawFence(s, z);
 
   s.pushMatrix();
-  s.translate(-s.width*.55, down);
+  s.translate(-s.width*.7, down);
   s.rotate(radians(0));
   s.image(shotgun1, 0, 0, w, h);
   s.popMatrix();
 
+  // right shotgun
   s.pushMatrix();
   s.translate(s.width*.3, down);
   s.rotate(radians(0));
   s.image(shotgun2, 0, 0, w, h);
   s.popMatrix();
 
-  
+
 
   s.popMatrix();
 }
@@ -249,24 +250,35 @@ void displaySky(PGraphics s) {
     s.popMatrix();
   }
 
-  displayHouse(s, -1300);
+
+  //displayHouse(s, 0);
 }
 
 void displayCement(PGraphics s, int z) {
+  int gradStarts = 450;
   s.pushMatrix();
-  s.translate(-s.width*2, -350, z);
+  s.translate(-s.width*2, -150, z);
   s.noStroke();
   //s.rotateX(radians(90));
-  s.fill(cementColor);
+  //s.fill(0);
   //s.textureWrap(REPEAT);
   //s.textureMode(NORMAL);
   s.beginShape();
   //s.texture(cement);
+  s.fill(100);
   s.vertex(-s.width, 0, 0, 0);
-  s.vertex(s.width*6, 0, 1, 0);
-  s.vertex(s.width*6, s.height*2, 1, 1);
-  s.vertex(-s.width, s.height*2, 0, 1);
+  float inc = 0;
+  for (int i = -s.width; i <= s.width*6; i+= 50) {
+    //s.fill((i+s.width)*1.0/(s.width*7) * 255);
+    s.vertex(i, noise(inc += 0.05)*150, (i+s.width)*1.0/(s.width*7), 0);
+  }
+  s.fill(cementColor);
+  s.vertex(s.width*6, gradStarts, 1, 0);
+  //s.vertex(s.width*6, s.height*2, 1, 1);
+  //s.vertex(-s.width, s.height*2, 0, 1);
+  s.vertex(-s.width, gradStarts, 0, 0);
   s.endShape();
+  s.rect(-s.width, gradStarts, s.width*7,  s.height*2);
   s.popMatrix();
 }
 
@@ -359,12 +371,19 @@ void waterOff() {
   waterY = -150;
 }
 void setWater() {
-  incSpawnedFloat();
+  //incSpawnedFloat();
   float lowestSea = -150;
   float maxs = 200;
-  
-  float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
-  maxSea = constrain(maxSea, -100, maxs);
+
+
+  if (TESTING) {
+    maxs = 30;
+    lowestSea = -60;
+  }
+
+  //float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
+  //maxSea = constrain(maxSea, -100, maxs);
+  float maxSea = maxs;
   if (isRaining) {
 
     waterY = map(millis() - lastRainTime, 0, rainLasts, lowestSea, maxSea);
