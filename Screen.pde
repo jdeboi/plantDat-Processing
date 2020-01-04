@@ -6,8 +6,8 @@ boolean isCalibrating = true;
 void initScreens() {
   ks = new Keystone(this);
   
-  surface = ks.createQuadPinSurface(800, 800, 20);
-  canvas = createGraphics(800, 800, P3D);
+  surface = ks.createQuadPinSurface(width, height, 20);
+  canvas = createGraphics(width, height, P3D);
 }
 
 void saveKeystone() {

@@ -64,7 +64,11 @@ class GrassBlade extends Plant {
     s.rotate(angle);
 
     numBranch = 0;
-    stem(s, plantHeight*growthScaler, 0, age, stemStroke);
+    stem(s, plantHeight*growthScaler*.8, radians(-8), age, stemStroke);
+    numBranch = 0;
+    if (id %2 == 0) stem(s, plantHeight*growthScaler, 0, age, stemStroke);
+    numBranch = 0;
+    if (id %3 == 0) stem(s, plantHeight*growthScaler*.6, radians(6), age, stemStroke);
     s.popMatrix();
   }
   

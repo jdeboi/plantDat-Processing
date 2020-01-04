@@ -1,4 +1,4 @@
-int lifeTimeSeconds = 1*60; // 3 minutes
+int lifeTimeSeconds = 1*10; // 3 minutes
 int lifeTimeFrames = lifeTimeSeconds*60; // 60 frames / second 
 float ageInc = 1.0/lifeTimeFrames;
 int plantID = 0;
@@ -7,7 +7,8 @@ color stemStroke;
 
 class Plant {
 
-  int x, y, z, id;
+
+  int x, y, z, id, pID;
 
   // age
   float age = 0;
@@ -65,6 +66,7 @@ class Plant {
     stemAngle = radians(random(-5, 5));
 
     id = code;
+    pID = plantID++;
     if (code  < 0) seed = int(random(0, 100));
     col = color(0, random(150, 255), 0);
     // maybe everything should just start at 0
@@ -150,7 +152,7 @@ class Plant {
 
   void stem(PGraphics s, float plantH, float ang, float stemAge, color stCol) {
     s.pushMatrix();
-    
+
     float len = 1.0* plantH / numSegments; 
     s.translate(0, len);
     for (int i = 0; i < numSegments; i++) {
@@ -197,6 +199,7 @@ class Plant {
     s.popMatrix();
   }
 
+
   void leaf(float h, PGraphics s) {
     //s.ellipse(-50, 0, 100, 10);
     //s.ellipse(50, 0, 100, 10);
@@ -232,15 +235,15 @@ public class PlantFile {
   boolean isFlipped;
   int snapX, snapY;
   float sc;
-  float rot;
+  float radRot;
 
-  PlantFile(String path, boolean isFlipped, float snapx, float snapy, float sc, float rot) {
+  PlantFile(String path, boolean isFlipped, float snapx, float snapy, float sc, float rad) {
     img = loadShape("plants/" + path);
     this.isFlipped = isFlipped;
     this.snapX = int(snapx);
     this.snapY = int(snapy);
     this.sc = sc;
-    this.rot = rot;
+    this.radRot = rad;
   }
 
   void display(float _x, float _y, float _r, float _sc, boolean _isF, PGraphics s) {
@@ -259,11 +262,20 @@ public class PlantFile {
     s.scale(sc*_sc);
 
     //float n = radians(10)*noise(num*50+millis()/1000.0);
-    s.rotate(rot+_r);
+
+    s.rotate(radRot+_r);
     s.translate(-snapX, -snapY);
 
     s.shape(img, 0, 0);
 
     s.popMatrix();
+  }
+  
+  float getW() {
+    return img.width*sc;
+  }
+  
+  float getH() {
+    return img.height*sc;
   }
 }

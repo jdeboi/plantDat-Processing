@@ -1,11 +1,12 @@
 int rainLasts = 1*60*1000;
-int sunLasts = 1*60*1000;
+int sunLasts = 2*60*1000;
 long lastRainTime = 0;
 
-PImage shotgun1, shotgun2;
+//PShape adobe1;
+PImage adobe1, adobe2;
 PImage cement;
 PImage fence;
-
+PImage bkground;
 PImage plants[];
 
 boolean isRaining = true;
@@ -31,6 +32,8 @@ AudioPlayer rainSound;
 AudioPlayer windSound;
 
 boolean rainEnding = false;
+
+Barrel barrel;
 
 void playSounds() {
   if (thundering) {
@@ -148,10 +151,11 @@ void initBackground() {
   startDayColor = color(#BCF5FF);
   midDayColor = color(#FFB4EE);
   endDayColor = color(#6965D6);
-  
-  shotgun1 = loadImage("images/sidehousepaint1.png");
-  shotgun2 = loadImage("images/sidehousepaint2.png");
-  
+
+  adobe1 = loadImage("images/house.png");
+  adobe2 = loadImage("images/house.png");
+  barrel = new Barrel();
+  bkground = loadImage("images/backgroundtest.png");
   fence = loadImage("images/fence.png");
 
   minim = new Minim(this);
@@ -164,29 +168,32 @@ void initBackground() {
 void displayHouse(PGraphics s, int z ) {
   s.pushMatrix();
 
-  float w = s.width*1.1;
-  float down = -340;
-  float factor = w/shotgun2.width;
-  float h = shotgun2.height*factor;
+  float w = s.width*1.75;
+  float down = -s.height*.5; 
+  float factor = w/adobe1.width;
+  float h = adobe1.height*factor;
 
-  s.translate(0, down, z);
 
-  displayCement(s, z-1);
+  //displayMountains(s, down, z*2-3);
+  displayCement(s, down+100, z*2-3) ;
   //drawFence(s, z);
 
+
+  s.translate(-s.width*.3, down-350, z);
   s.pushMatrix();
-  s.translate(-s.width*.55, down);
-  s.rotate(radians(0));
-  s.image(shotgun1, 0, 0, w, h);
+  //s.translate(0, 350, 0);
+
+  barrel.display(w-350, 700, 0, s);
+  s.image(adobe1, 0, 0, w, h);
   s.popMatrix();
 
   s.pushMatrix();
-  s.translate(s.width*.3, down);
+  s.translate(s.width*.6, 0);
   s.rotate(radians(0));
-  s.image(shotgun2, 0, 0, w, h);
+  //s.image(adobe2, 0, 0, w, h);
   s.popMatrix();
 
-  
+
 
   s.popMatrix();
 }
@@ -197,10 +204,10 @@ void drawFence(PGraphics s, int z) {
   float fenceH = 170;
   float factor = fenceH/fence.height;
   for (int i = int(s.width*1.4); i < s.width*2; i+= fence.width*factor) {
-    s.image(fence, i, shotgun1.height*2-fenceH, fence.width*factor, fenceH);
+    s.image(fence, i, adobe1.height*2-fenceH, fence.width*factor, fenceH);
   }
   for (int i = -1500; i < 300; i+= fence.width*factor) {
-    s.image(fence, i, shotgun1.height*2-fenceH, fence.width*factor, fenceH);
+    s.image(fence, i, adobe1.height*2-fenceH, fence.width*factor, fenceH);
   }
   s.popMatrix();
 }
@@ -218,67 +225,137 @@ void checkRain() {
   }
 }
 
-void displaySky(PGraphics s) {
-  s.noStroke();
-  for (int i = 0; i < 5; i++) {
-    s.pushMatrix();
-    s.translate(-s.width*2 + i*s.width, -200, -800);
-    color c1 = color(#6965D6);
-    color c2 = color(#FFADFB);
-    color c3 = color(#FFDAAD);
+//void displaySky(PGraphics s) {
+//  s.noStroke();
+//  for (int i = 0; i < 5; i++) {
+//    s.pushMatrix();
+//    s.translate(-s.width*2 + i*s.width, -200, -800);
+//    color c1 = color(#6965D6);
+//    color c2 = color(#FFADFB);
+//    color c3 = color(#FFDAAD);
 
-    float per = 0.6;
-    int screenH = int(s.height*2.5);
-    s.beginShape();
-    s.fill(c1);
-    s.vertex(0, 0);
-    s.vertex(s.width, 0);
-    s.fill(c2);
-    s.vertex(s.width, screenH*per);
-    s.vertex(0, screenH*per);
-    s.endShape();
+//    float per = 0.6;
+//    int screenH = int(s.height*2.5);
+//    s.beginShape();
+//    s.fill(c1);
+//    s.vertex(0, 0);
+//    s.vertex(s.width, 0);
+//    s.fill(c2);
+//    s.vertex(s.width, screenH*per);
+//    s.vertex(0, screenH*per);
+//    s.endShape();
 
-    s.beginShape();
-    s.fill(c2);
-    s.vertex(0, screenH*per);
-    s.vertex(s.width, screenH*per);
-    s.fill(c3);
-    s.vertex(s.width, screenH);
-    s.vertex(0, screenH);
-    s.endShape();
-    s.popMatrix();
-  }
+//    s.beginShape();
+//    s.fill(c2);
+//    s.vertex(0, screenH*per);
+//    s.vertex(s.width, screenH*per);
+//    s.fill(c3);
+//    s.vertex(s.width, screenH);
+//    s.vertex(0, screenH);
+//    s.endShape();
+//    s.popMatrix();
+//  }
 
-  displayHouse(s, -1300);
-}
+//  displayHouse(s, -1300);
+//}
 
-void displayCement(PGraphics s, int z) {
+void displayMountains(PGraphics s, float y, int z) {
+  int gradStarts = 450;
   s.pushMatrix();
-  s.translate(-s.width*2, -450, z);
+  s.translate(-s.width*2, -s.height*2.5, z);
   s.noStroke();
   //s.rotateX(radians(90));
-  s.fill(cementColor);
+  //s.fill(0);
   //s.textureWrap(REPEAT);
-  //s.textureMode(NORMAL);
+  s.fill(255);
+  s.textureMode(NORMAL);
   s.beginShape();
-  //s.texture(cement);
+  s.texture(bkground);
+  //s.fill(darkCementColor);
   s.vertex(-s.width, 0, 0, 0);
   s.vertex(s.width*6, 0, 1, 0);
-  s.vertex(s.width*6, s.height*2, 1, 1);
-  s.vertex(-s.width, s.height*2, 0, 1);
+  s.vertex(s.width*6, s.height*3, 1, .95);
+  s.vertex(-s.width, s.height*3, 0, .95);
+  s.vertex(-s.width, 0, 0, 0);
   s.endShape();
   s.popMatrix();
 }
 
-Drop[] drops;
-int dropIndex = 0;
-long dropTime = 0;
-long dropSpawnTime = 5;
+void displayCement(PGraphics s, float y, int z) {
+  int gradStarts = 450;
+  s.pushMatrix();
+  s.translate(-s.width*2, y, z);
+  s.noStroke();
+  //s.rotateX(radians(90));
+  //s.fill(0);
+  //s.textureWrap(REPEAT);
+  //s.textureMode(NORMAL);
+  s.beginShape();
+  //s.texture(cement);
+  s.fill(darkCementColor);
+  s.vertex(-s.width, 0, 0, 0);
+  float inc = 0;
+  for (int i = -s.width; i <= s.width*6; i+= 50) {
+    //s.fill((i+s.width)*1.0/(s.width*7) * 255);
+    s.vertex(i, noise(inc += 0.05)*150, (i+s.width)*1.0/(s.width*7), 0);
+  }
+  s.fill(cementColor);
+  s.vertex(s.width*6, gradStarts, 1, 0);
+  //s.vertex(s.width*6, s.height*2, 1, 1);
+  //s.vertex(-s.width, s.height*2, 0, 1);
+  s.vertex(-s.width, gradStarts, 0, 0);
+  s.endShape();
+  s.rect(-s.width, gradStarts, s.width*7, s.height*2);
+  s.popMatrix();
+}
+
+Drop[] drops = new Drop[500]; // array of drop objects
 
 void initDrops() {
-  drops = new Drop[200];
-  for (int i = 0; i < drops.length; i++) {
+  for (int i = 0; i < drops.length; i++) { // we create the drops 
     drops[i] = new Drop();
+  }
+}
+
+void rain(PGraphics s) {
+  for (int i = 0; i < drops.length; i++) {
+    drops[i].fall(s); // sets the shape and speed of drop
+    drops[i].show(s); // render drop
+  }
+}
+
+class Drop {
+  float x; // x postion of drop
+  float y; // y position of drop
+  float z; // z position of drop , determines whether the drop is far or near
+  float len; // length of the drop
+  float yspeed; // speed of te drop
+
+  //near means closer to the screen , ie the higher the z value ,closer the drop is to the screen.
+  Drop() {
+    x  = random(width); // random x position ie width because anywhere along the width of screen
+    y  = random(-500, -50); // random y position, negative values because drop first begins off screen to give a realistic effect
+    z  = random(0, 20); // z value is to give a perspective view , farther and nearer drops effect
+    len = map(z, 0, 20, 10, 20); // if z is near then  drop is longer
+    yspeed  = map(z, 0, 20, 1, 20); // if z is near drop is faster
+  }
+
+  void fall(PGraphics s) { // function  to determine the speed and shape of the drop 
+    y = y + yspeed; // increment y position to give the effect of falling 
+    float grav = map(z, 0, 20, 0, 0.2); // if z is near then gravity on drop is more
+    yspeed = yspeed + grav; // speed increases as gravity acts on the drop
+
+    if (y > s.height) { // repositions the drop after it has 'disappeared' from screen
+      y = random(-200, -100);
+      yspeed = map(z, 0, 20, 4, 10);
+    }
+  }
+
+  void show(PGraphics s) { // function to render the drop onto the screen
+    float thick = map(z, 0, 20, 1, 3); //if z is near , drop is more thicker 
+    s.strokeWeight(thick); // weight of the drop
+    s.stroke(155); // purple color
+    s.line(x, y, x, y+len); // draws the line with two points
   }
 }
 
@@ -301,86 +378,15 @@ void displayRain(PGraphics s) {
     //}
     int amt = 1;
     if (millis() - lastRainTime > rainLasts *.8) amt = int(map(millis()-lastRainTime, rainLasts*.7, rainLasts, 1, 8));
-    for (int i = 0; i < drops.length; i+=amt) {
-      drops[i].fall(20);
-      drops[i].display(s);
-    }
+    rain(s);
   }
 }
 
-class Drop {
-  int x, y, yMax, len;
-
-  Drop() {
-    x = int(random(width));
-    y = int(random(-1000, 0));
-
-    len = int(random(8, 20));
-    yMax = int(map(len, 8, 20, height*.4, height));
-  }
-
-  void fall(int speed) {
-
-    //if (y > -100) y += speed;
-    //if (y > yMax) {
-    //  y = -100;
-    //}
-    if (isRaining) {
-      y += speed;
-      if (y > yMax) {
-        y = -100;
-      }
-    } else {
-      if (y > -20) {
-        y += speed;
-        if (y > yMax) {
-          y = -100;
-        }
-      }
-    }
-  }
-
-  void spawn() {
-    y = -20;
-  }
-
-  void display(PGraphics s) {
-    s.stroke(200);
-    int sw = int(map(len, 8, 20, 1, 4));
-    s.strokeWeight(sw);
-    s.fill(255);
-    //ellipse(x, y, 100, 100);
-    s.line(x, y, x, y-len);
-  }
-}
-
-float waterY = 0;
-void waterOff() {
-  waterY = -150;
-}
-void setWater() {
-  incSpawnedFloat();
-  float lowestSea = -150;
-  float maxs = 200;
-  
-  float maxSea = map(spawnedFloat, 0, MAX_SPAWNED, maxs, -120);
-  maxSea = constrain(maxSea, -100, maxs);
-  if (isRaining) {
-
-    waterY = map(millis() - lastRainTime, 0, rainLasts, lowestSea, maxSea);
-    waterY = constrain(waterY, lowestSea, maxSea);
-  } else {
-    if (millis() - lastRainTime >  rainLasts+sunLasts*.3) {
-      waterY = map(millis() - lastRainTime, rainLasts+sunLasts*.3, rainLasts+sunLasts*.7, maxSea, lowestSea);
-      waterY = constrain(waterY, lowestSea, maxSea);
-    }
-  }
-}
 
 
 void wind() {
   //float windForce = map(mouseX, 0, width, -PI/7, PI/7);
-  float windForce = map(noise(0, flyingTerr), 0, 1, -PI/15, PI/15);
+  float windForce = map(noise(0, flyingTerr), 0, 1, -PI/20, PI/20);
   //windAngle =  windForce + windForce/4 * 2*PI * sin(mouseX/1000.0);
   windAngle =  windForce + windForce/4 *sin(map(noise(0, flyingTerr), 0, 1, 0, width)/1000.0);
 }

@@ -1,3 +1,5 @@
+int port = 8888; // 843 flash policy port
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -94,7 +96,7 @@ public class ServerThread extends Thread {
     public void run() {
     try {
       WebSocketImpl.DEBUG = false;
-      int port = 8025; // 843 flash policy port
+      
       try {
         port = Integer.parseInt( args[ 0 ] );
       } 

@@ -10,27 +10,8 @@ PShape shovel;
 void initPermPlants() {
   permPlants = new ArrayList<Plant>();
 
-  // right side plants
-  permPlants.add(new Lizard(getSpawnedXY(82, -15), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(85, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(87, -15), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(90, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(92, -20), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(93, -10), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(95, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(97, -20), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(100, 0), 1.0, false));
-
-  // left side plants
-  permPlants.add(new Lizard(getSpawnedXY(0, -15), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(2, -20), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(3, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(5, -15), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(7, -5), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(10, -10), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(12, 0), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(15, -12), 1.0, false));
-  permPlants.add(new Lizard(getSpawnedXY(18, 0), 1.0, false));
+  permPlants.add(new Cane(getSpawnedXY(20, 0), 1.0, false));
+  permPlants.add(new Cane(getSpawnedXY(22, 0), 1.0, false));
 }
 
 void displaySpawned(PGraphics s) {
@@ -56,7 +37,7 @@ void removeDeadPlants() {
     if (!spawnedPlants.get(i).alive) {
       //int code = spawnedPlants.get(i).id;
       spawnedPlants.remove(i);
-      println("removed old plant");
+      //println("removed old plant");
       // can forsee an issue where time delay means plant will respawn, flash, based on timing differences of web app and this program
       //spawnedPlantIDs.remove(code);
     } else {
@@ -114,25 +95,15 @@ void addNewPlant(JSONObject pObj, int code) {
   String name = plant.getString("plantType"); 
   int x = plant.getInt("x");
   int y = plant.getInt("y");
-  PVector xy = getSpawnedXY(x, y);
+  PVector xy = getStreetSpawn(x, y);
 
-  if (name.equals("Lizard's Tail")) {
-    spawnedPlants.add(new Lizard(xy, age, code));
+  if (name.equals("Blue")) {
+    spawnedPlants.add(new Blue(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("American Beautyberry")) {
-    println("asd");
-    spawnedPlants.add(new Beauty(xy, age, code));
+  } else if (name.equals("Spoon")) {
+    spawnedPlants.add(new Spoon(xy, age, code));
     println("added new plant", name);
-  } else if (name.equals("Clasping Cone Flower")) {
-    spawnedPlants.add(new Clasping(xy, age, code));
-    println("added new plant", name);
-  } else if (name.equals("Correll’s Obedient Plant")) {
-    spawnedPlants.add(new Obedient(xy, age, code));
-    println("added new plant", name);
-  } else if (name.equals("Stokes Aster")) {
-    spawnedPlants.add(new Stokes(xy, age, code));
-    println("added new plant", name);
-  }
+  } 
 
   println("Num spawned plants: ", spawnedPlants.size());
 }
@@ -153,61 +124,65 @@ void displaySpawnedPlants(PGraphics s) {
   }
 }
 
+
 // remeber that y is zero at the top of the screen...
 PVector getSpawnedXY(float x, float y) {
-  float zMin = -1799;
+  float zMin = getBackWater()-500;
   float zMax = -50;
   float newZ = map(y, 0, 100, zMin, zMax);
-  float newY =  map(y, 100, 0, canvas.height+5, -20);
-  float newX = map(x, 0, 100, newZ*.56 + 15, canvas.width-newZ*.57-20);
+  float newY =  map(y, 100, 0, canvas.height+10, 200);
+  //float newX = map(x, 0, 100, newZ*.8 + 15, canvas.width-newZ*.8-70);
+  float newX = map(x, 0, 100, newZ + 15, canvas.width-newZ-70);
+  //println("spawned x " + x + "y" + y + " dx " + newX + " dy " + newY + " dz " + newZ);
   return new PVector(newX, newY, newZ);
 }
 
-void reduceWaterPlants() {
-  if (TESTING) {
-    for (Plant p : permPlants) {
-      PVector temp = getWaterLoc(p.x, p.y, p.z);
-      reduceWater(int(temp.x), int(temp.y), p.plantHeight);
-    }
-  } else {
-    for (Plant p : spawnedPlants) {
-      PVector temp = getWaterLoc(p.x, p.y, p.z);
-      reduceWater(int(temp.x), int(temp.y), p.plantHeight);
-    }
-  }
+
+PVector getStreetSpawn(float x, float y) {
+  float xval1 = 63-(rowsTerr -y)*.26;
+  float xval2 = 80-(rowsTerr -y)*.35;
+  float mid = (xval2+xval1)/2;
+  if (x > xval1 && x <= mid)  return getSpawnedXY(random(0, xval1), y);
+  else if (x > mid && x < xval2) return getSpawnedXY(random(xval2, 100), y);
+  return getSpawnedXY(x, y);
 }
 
-PVector getWaterLoc(float x, float y, float z) {
-  float zMin = -1799;
-  float zMax = 0;
-  float minX = map(z, zMax, zMin, 22, 8);
-  float maxX = map(z, zMax, zMin, 32, 45);
-  float minY = 0;
-  float maxY = 25;
-
-  float newX = map(x, z*.6 + 15, canvas.width-z*.55-80, minX, maxX);
-  float newY = map(z, zMax, zMin, maxY, minY);
-
-  //float dis = sqrt(y*y + z *z);
-  //float newY = map(dis, 0, rowsTerr*spacingTerr*(3.0/4.0), rowsTerr*(1.0/4), rowsTerr);
-  //newY = constrain(newY, 0, rowsTerr-1);
-
-  //float newX = colsTerr/2 - (x - canvas.width/2)*1.0/spacingTerr; 
-  //newX = constrain(newX, 0, colsTerr-1);
-
-  return new PVector(newX, newY);
+float getSpawnedY(float z) {
+  float zMin = getBackWater()-500;
+  float zMax = -50;
+  float newY =  map(z, zMax, zMin, canvas.height+10, 200);
+  return newY;
 }
 
 void spawnFakePlants() {
-  int i = 0;
-  for (int x = 0; x <10; x ++) {
-    if (i%5 == 0) spawnedPlants.add(new Stokes(getSpawnedXY(random(100), random(100)), 1.0, false));
-    else if (i%5 == 1) spawnedPlants.add(new Lizard(getSpawnedXY(random(100), random(100)), 1.0, false));
-    else if (i%5 == 2) spawnedPlants.add(new Beauty(getSpawnedXY(random(100), random(100)), 1.0, false));
-    else if (i%5 == 3) spawnedPlants.add(new Clasping(getSpawnedXY(random(100), random(100)), 1.0, false));
-    else if (i%5 == 4) spawnedPlants.add(new Obedient(getSpawnedXY(random(100), random(100)), 1.0, false));
-    i++;
+  for (int x = 0; x <= 100; x += 25) {
+    for (int y = 0; y <= 100; y+= 25) {
+      PVector temp = getSpawnedXY(x, y);
+      //int i = int(random(5));
+      //if (i == 0) permPlants.add(new Spoon(temp, 0, -1));
+      //else if (i == 1) permPlants.add(new Cane(temp, 0, -1));
+      //else if (i == 2) permPlants.add(new Blue(temp, 0, -1));
+      //else if (i == 3) permPlants.add(new Sunflower(temp, 0, -1));
+      //else if (i == 4) permPlants.add(new Milkweed(temp, 0, -1));
+      permPlants.add(new Sunflower(temp, 0, -1));
+    }
   }
+
+  //for (int y = 0; y < 100; y+= 10) {
+  //  float x = 63-(rowsTerr -y)*.26;;
+  //  PVector temp = getSpawnedXY(x, y);
+  //  permPlants.add(new Spoon(temp, 0, -1));
+
+  //  x = 80-(rowsTerr -y)*.35;;
+  //  temp = getSpawnedXY(x, y);
+  //  permPlants.add(new Spoon(temp, 0, -1));
+  //}
+
+  // for (int y = 0; y < 100; y+= 20) {
+  //  float x = 85 - 1*y;
+  //  PVector temp = getSpawnedXY(x, y);
+  //  permPlants.add(new Spoon(temp, 0, -1));
+  //}
 }
 
 long recurringPlantTime = 0;
@@ -216,11 +191,12 @@ void spawnRecurringPlants(int delayt) {
   int i = int(random(5));
   if (millis() - recurringPlantTime > delayt) {
     recurringPlantTime = millis();
-    if (i == 0) spawnedPlants.add(new Stokes(getSpawnedXY(random(100), random(100)), 0, -1));
-    else if (i == 1) spawnedPlants.add(new Lizard(getSpawnedXY(random(100), random(100)), 0, -1));
-    else if (i == 2) spawnedPlants.add(new Beauty(getSpawnedXY(random(100), random(100)), 0, -1));
-    else if (i == 3) spawnedPlants.add(new Clasping(getSpawnedXY(random(100), random(100)), 0, -1));
-    else if (i == 4) spawnedPlants.add(new Obedient(getSpawnedXY(random(100), random(100)), 0, -1));
+    PVector temp = getStreetSpawn(random(100), random(100));
+    if (i == 0) permPlants.add(new Spoon(temp, 0, -1));
+    else if (i == 1) permPlants.add(new Cane(temp, 0, -1));
+    else if (i == 2) permPlants.add(new Blue(temp, 0, -1));
+    else if (i == 3) permPlants.add(new Sunflower(temp, 0, -1));
+    else if (i == 4) permPlants.add(new Milkweed(temp, 0, -1));
   }
 }
 
@@ -232,8 +208,12 @@ void displayBoundaries(PGraphics s) {
       s.pushMatrix();
       s.fill(255, 0, y*100);
       s.translate(temp.x, temp.y, temp.z);
-      PVector temp2 = getWaterLoc(temp.x, temp.y, temp.z);
-      reduceWater(int(temp2.x), int(temp2.y), 1);
+      reduceWater(temp.x, temp.y, temp.z, 1.0);
+      //println("tz" + temp.z);
+      //PVector temp2 = getWaterLoc(temp.x, temp.y, temp.z);
+      //reduceWater(int(temp2.x), int(temp2.y), 1);
+      //reduceWater(int(temp.x), int(temp.y), 1);
+      //println(temp.x + " " + temp.y + " " + temp.z);
       s.ellipse(0, 0, 30, 30);
       s.popMatrix();
     }
